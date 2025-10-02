@@ -1,64 +1,42 @@
-Explanation:
-Import Modules: Ensure fs, axios, and path are imported.
-Read JSON File: The getData function reads the JSON file and parses its content.
-Fetch Data: The fetchData function sends the JSON content to the API endpoint using axios.post.
-Main Function: The main function reads the JSON file and fetches data from the API.
-Interval: The setInterval function calls the main function at regular intervals (every 1 minute).
+# Ennakointi-node-rest
 
+Tämä projekti sisältää PHP- ja Node.js-ohjelmia, jotka hakevat Tilastokeskuksen rajapinnoista (API) ajankohtaista tietoa Hämeen alueen väestöstä, työpaikoista, valmistuneista, työttömistä, avoimista työpaikoista ja vieraskielisistä. Ohjelmat tallentavat tiedot MySQL-tietokantaan jatkokäyttöä varten.
 
-# Fetching REST API Data from Tilastokeskus
+## Mitä ohjelmat tekevät?
+- **fetchVaesto_11re.php**: Hakee väestötiedot Tilastokeskuksen API:sta ja tallentaa ne Asukasmaara-tauluun.
+- **fetchVierasKieliset_11c4.php**: Hakee vieraskielisten ja ulkomaalaisten opiskelijoiden määrät ja tallentaa ne Vieraskieliset-tauluun.
+- **fetchTyottomat_12r5.php**: Hakee työttömien määrät ja tallentaa ne tietokantaan.
+- **fetchAlueenTyopaikat_115h.php**: Hakee alueen työpaikkatiedot ja tallentaa ne tietokantaan.
+- **fetchavoimetpaikat12tw.php**: Hakee avoimet työpaikat ja tallentaa ne tietokantaan.
+- **fetchValmistuneet_12bs.php**: Hakee valmistuneiden määrät ja tallentaa ne tietokantaan.
 
-Tämä opas auttaa sinua hakemaan tietoja Tilastokeskuksen REST API:sta käyttämällä Node.js:ää.
+Kaikki ohjelmat lukevat .json-muotoisen kyselytiedoston, lähettävät sen Tilastokeskuksen API:lle, käsittelevät JSON-stat2-vastauksen ja päivittävät tietokannan.
 
-## Prerequisites
+## Ajastettu ajo (crontab)
+Ohjelmat voidaan ajastaa Linux-palvelimella ajettavaksi automaattisesti esimerkiksi kerran päivässä crontabilla.
 
-- Node.js installed on your machine
-- Basic knowledge of JavaScript and Node.js
+1. Avaa crontab muokattavaksi:
+   ```
+   crontab -e
+   ```
+2. Lisää rivi jokaista ajettavaa ohjelmaa varten, esim. joka päivä klo 04:07:
+   ```
+   7 4 * * * php /polku/projektiin/fetchVaesto_11re.php
+   7 4 * * * php /polku/projektiin/fetchVierasKieliset_11c4.php
+   7 4 * * * php /polku/projektiin/fetchTyottomat_12r5.php
+   7 4 * * * php /polku/projektiin/fetchAlueenTyopaikat_115h.php
+   7 4 * * * php /polku/projektiin/fetchavoimetpaikat12tw.php
+   7 4 * * * php /polku/projektiin/fetchValmistuneet_12bs.php
+   ```
+   Vaihda `/polku/projektiin/` oikeaksi hakemistopoluksi.
 
-## Steps
+3. Tallenna ja sulje crontab (esim. nano: Ctrl+O, Enter, Ctrl+X).
 
-1. **Initialize a new Node.js project**
+## Vaatimukset
+- PHP (vähintään 7.x)
+- MySQL-tietokanta
+- Yhteys Tilastokeskuksen PxWeb API:in
+- Oikeat tietokantataulut ja -rakenne (katso kunkin skriptin kommentit)
 
-    ```bash
-    mkdir tilastokeskus-api
-    cd tilastokeskus-api
-    npm init -y
-    ```
-
-2. **Install required packages**
-
-    ```bash
-    npm install axios
-    ```
-
-3. **Create a script to fetch data**
-
-    Create a file named `index.js` and add the following code:
-
-    ```javascript
-    const axios = require('axios');
-
-    const fetchData = async () => {
-      try {
-         const response = await axios.get('https://api.tilastokeskus.fi/v1/data');
-         console.log(response.data);
-      } catch (error) {
-         console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-    ```
-
-4. **Run the script**
-
-    ```bash
-    node index.js
-    ```
-
-This script will fetch data from the Tilastokeskus API and log it to the console.
-
-## Additional Resources
-
-- [Tilastokeskus API Documentation](https://www.tilastokeskus.fi/api)
-- [Axios Documentation](https://axios-http.com/docs/intro)
+## Yhteystiedot
+Lisätietoja: [Tilastokeskus PxWeb API](https://stat.fi/tilastot/pxweb)
