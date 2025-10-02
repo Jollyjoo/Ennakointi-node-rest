@@ -54,6 +54,7 @@ function getData($jsonFile) {
     return json_decode($data, true);
 }
 
+
 // Funktio datan hakemiseen API:sta
 function fetchData($apiUrl, $postData) {
     // Määritellään HTTP POST -pyynnön asetukset
