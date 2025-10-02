@@ -8,3 +8,10 @@ deployment:
     - /bin/cp fetchAlueenTyopaikat_115h.php $DEPLOYPATH
     - /bin/cp fetchavoimetpaikat12tw.php $DEPLOYPATH
     - /bin/cp fetchValmistuneet_12bs.php $DEPLOYPATH
+    - /bin/cp _alueentyopaikat_115h.json $DEPLOYPATH
+    - /bin/cp _avoimetpaikat12tw.json $DEPLOYPATH
+    - /bin/cp _tyottomat_12r5.json $DEPLOYPATH
+    - /bin/cp _vaesto_11re.json $DEPLOYPATH
+    - /bin/cp _valmistuneet_12bs.json $DEPLOYPATH
+    - /bin/cp _vieraskiel_11c4.json $DEPLOYPATH
+    - /bin/cp db.php $DEPLOYPATH
