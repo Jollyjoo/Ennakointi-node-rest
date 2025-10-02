@@ -1,0 +1,57 @@
+{
+  "query": [
+    {
+      "code": "Työpaikan alue",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS",
+          "KU016",
+          "KU061",
+          "KU081",
+          "KU082",
+          "KU086",
+          "KU111",
+          "KU098",
+          "KU103",
+          "KU109",
+          "KU142",
+          "KU165",
+          "KU169",
+          "KU316",
+          "KU398",
+          "KU433",
+          "KU560",
+          "KU576",
+          "KU694",
+          "KU781",
+          "KU834",
+          "KU981"
+        ]
+      }
+    },
+    {
+      "code": "Toimiala",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS"
+        ]
+      }
+    },
+    {
+      "code": "Sukupuoli",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS",
+          "1",
+          "2"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}

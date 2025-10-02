@@ -1,0 +1,20 @@
+{
+  "name": "ennakointi-node-rest",
+  "version": "1.0.0",
+  "description": "Haetaan ajastetusti dataa tilastokeskukselta ja kirjoitetaan sitä kantaan.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Ennakointi-node-rest"
+  },
+  "author": "Christian",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "fs": "^0.0.1-security",
+    "mssql": "^11.0.1"
+  }
+}

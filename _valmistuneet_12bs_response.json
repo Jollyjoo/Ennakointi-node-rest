@@ -1,0 +1,141 @@
+{
+    "version": "2.0",
+    "class": "dataset",
+    "label": "15 vuotta täyttänyt väestö koulutusasteen, maakunnan, kunnan, sukupuolen ja ikäryhmän mukaan muuttujina Vuosi, Alue ja Tiedot",
+    "source": "Tilastokeskus, väestön koulutusrakenne",
+    "updated": "2024-09-23T08:00:00Z",
+    "note": [
+        "<A HREF='https://stat.fi/tilasto/dokumentaatio/vkour' TARGET=_blank>Tilaston dokumentaatio</A>"
+    ],
+    "role": {
+        "time": [
+            "Vuosi"
+        ],
+        "geo": [
+            "Alue"
+        ],
+        "metric": [
+            "Tiedot"
+        ]
+    },
+    "id": [
+        "Vuosi",
+        "Alue",
+        "Tiedot"
+    ],
+    "size": [
+        1,
+        3,
+        3
+    ],
+    "dimension": {
+        "Vuosi": {
+            "label": "Vuosi",
+            "category": {
+                "index": {
+                    "2023": 0
+                },
+                "label": {
+                    "2023": "2023"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        },
+        "Alue": {
+            "label": "Alue",
+            "note": [
+                "Alue"
+            ],
+            "category": {
+                "index": {
+                    "SSS": 0,
+                    "MK05": 1,
+                    "MK07": 2
+                },
+                "label": {
+                    "SSS": "KOKO MAA",
+                    "MK05": "MK05 Kanta-Häme",
+                    "MK07": "MK07 Päijät-Häme"
+                }
+            },
+            "extension": {
+                "elimination": true,
+                "eliminationValueCode": "SSS",
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Alue": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Tiedot": {
+            "label": "Tiedot",
+            "category": {
+                "index": {
+                    "osuus10": 0,
+                    "osuus3": 1,
+                    "osuus15": 2
+                },
+                "label": {
+                    "osuus10": "Perusasteen jälkeisen tutkinnon suorittaneiden osuus 15 vuotta täyttäneestä väestöstä, %",
+                    "osuus3": "Toisen asteen tutkinnon suorittaneiden osuus 15 vuotta täyttäneestä väestöstä, %",
+                    "osuus15": "Korkea-asteen tutkinnon suorittaneiden osuus 15 vuotta täyttäneestä väestöstä, %"
+                },
+                "unit": {
+                    "osuus10": {
+                        "base": "Prosentti",
+                        "decimals": 1
+                    },
+                    "osuus3": {
+                        "base": "Prosentti",
+                        "decimals": 1
+                    },
+                    "osuus15": {
+                        "base": "Prosentti",
+                        "decimals": 1
+                    }
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        }
+    },
+    "extension": {
+        "px": {
+            "tableid": "statfin_vkour_pxt_12bs",
+            "decimals": 0,
+            "official-statistics": true,
+            "aggregallowed": true,
+            "language": "fi",
+            "description": "12bs -- 15 vuotta täyttänyt väestö koulutusasteen, maakunnan, kunnan, sukupuolen ja ikäryhmän mukaan, 2007-2023",
+            "matrix": "001_12bs_2023",
+            "subject-code": "VKOUR"
+        },
+        "contact": [
+            {
+                "raw": "<A HREF='https://stat.fi/tilasto/vkour' TARGET=_blank>Tilaston kotisivu</A>"
+            }
+        ]
+    },
+    "value": [
+        75.1,
+        40.1,
+        33.8,
+        74.1,
+        42.8,
+        29.8,
+        72.3,
+        42.4,
+        28.6
+    ]
+}

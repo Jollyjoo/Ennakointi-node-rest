@@ -1,0 +1,49 @@
+{
+  "query": [
+    {
+      "code": "Alue",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS",
+          "MK05",          
+          "MK06",
+          "MK07",
+          "MK08",
+          "ELY04",
+          "ELY05",
+          "ELY06",
+          "ELY01"
+        ]
+      }
+    },
+    {
+      "code": "Kuukausi",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "NÄMÄ-AIKA-TIEDOT-LASKETAAN-KOODISSA",
+          "EI-KÄYTETÄ-TÄTÄ-ARVOA"
+        ]
+      }
+    },
+    {
+      "code": "Tiedot",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "TYOTTOMATLOPUSSA",
+          "TYOTOSUUS",
+          "TYOTTOMAT20",
+          "TYOTTOMAT25",
+          "TYOTTOMAT50",
+          "TYOTTOMATULK",
+          "UUDETAVP"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}

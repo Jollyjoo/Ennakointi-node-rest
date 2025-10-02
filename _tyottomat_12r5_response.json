@@ -1,0 +1,208 @@
+{
+    "version": "2.0",
+    "class": "dataset",
+    "label": "12r5 -- Työttömät työnhakijat eri ryhmissä, palveluissa olevat ja avoimet työpaikat kuukauden lopussa (1001) muuttujina Alue, Kuukausi ja Tiedot",
+    "source": "KEHA-keskus, Työnvälitystilasto",
+    "updated": "2025-06-03T10:00:00Z",
+    "note": [
+        "Korjaus 3.6.2025. Työnvälitystilaston taulukoista on korjattu tietoja kuntouttavan työtoiminnan ja omaehtoisen opiskelun tammi-huhtikuun lukujen osalta.",
+        "\r\n<A HREF='https://stat.fi/tilasto/dokumentaatio/tyonv' TARGET=_blank>Tilaston kuvaus</A>",
+        "... = Tieto on salassapitosäännön alainen"
+    ],
+    "role": {
+        "time": [
+            "Kuukausi"
+        ],
+        "geo": [
+            "Alue"
+        ],
+        "metric": [
+            "Tiedot"
+        ]
+    },
+    "id": [
+        "Alue",
+        "Kuukausi",
+        "Tiedot"
+    ],
+    "size": [
+        2,
+        2,
+        7
+    ],
+    "dimension": {
+        "Alue": {
+            "label": "Alue",
+            "category": {
+                "index": {
+                    "MK05": 0,
+                    "MK07": 1
+                },
+                "label": {
+                    "MK05": "MK05 Kanta-Häme",
+                    "MK07": "MK07 Päijät-Häme"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Alue": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Kuukausi": {
+            "label": "Kuukausi",
+            "category": {
+                "index": {
+                    "2025M03": 0,
+                    "2025M04": 1
+                },
+                "label": {
+                    "2025M03": "2025M03",
+                    "2025M04": "2025M04"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        },
+        "Tiedot": {
+            "label": "Tiedot",
+            "category": {
+                "index": {
+                    "TYOTTOMATLOPUSSA": 0,
+                    "TYOTOSUUS": 1,
+                    "TYOTTOMAT20": 2,
+                    "TYOTTOMAT25": 3,
+                    "TYOTTOMAT50": 4,
+                    "TYOTTOMATULK": 5,
+                    "UUDETAVP": 6
+                },
+                "label": {
+                    "TYOTTOMATLOPUSSA": "Työttömät työnhakijat laskentapäivänä (lkm.)",
+                    "TYOTOSUUS": "Työttömien työnhakijoiden %-osuus työvoimasta (%)",
+                    "TYOTTOMAT20": "Alle 20-v. työttömät työnhakijat (lkm.)",
+                    "TYOTTOMAT25": "Alle 25-v. työttömät työnhakijat (lkm.)",
+                    "TYOTTOMAT50": "Yli 50-v. työttömät työnhakijat (lkm.)",
+                    "TYOTTOMATULK": "Ulkomaalaisia työttömiä työnhakijoita laskentapäivänä (lkm.)",
+                    "UUDETAVP": "Uudet avoimet työpaikat kuukauden aikana (lkm.)"
+                },
+                "note": {
+                    "TYOTTOMATLOPUSSA": [
+                        "Työttömiä työnhakijoita kuukauden laskentapäivänä"
+                    ],
+                    "TYOTOSUUS": [
+                        "Työttömien työnhakijoiden %-osuus työvoimasta"
+                    ],
+                    "TYOTTOMAT20": [
+                        "Alle 20-vuotiaat työttömät työnhakijat kuukauden laskentapäivänä"
+                    ],
+                    "TYOTTOMAT25": [
+                        "Alle 25-vuotiaat työttömät työnhakijat kuukauden laskentapäivänä"
+                    ],
+                    "TYOTTOMAT50": [
+                        "Yli 50-vuotiaat työttömät työnhakijat kuukauden laskentapäivänä"
+                    ],
+                    "TYOTTOMATULK": [
+                        "Ulkomaalaiset työttömät työnhakijat kuukauden laskentapäivänä"
+                    ],
+                    "UUDETAVP": [
+                        "Kuukauden aikana ilmoitetut uudet avoimet työpaikat"
+                    ]
+                },
+                "unit": {
+                    "TYOTTOMATLOPUSSA": {
+                        "base": "lukumäärä",
+                        "decimals": 0
+                    },
+                    "TYOTOSUUS": {
+                        "base": "prosentti",
+                        "decimals": 1
+                    },
+                    "TYOTTOMAT20": {
+                        "base": "lukumäärä",
+                        "decimals": 0
+                    },
+                    "TYOTTOMAT25": {
+                        "base": "lukumäärä",
+                        "decimals": 0
+                    },
+                    "TYOTTOMAT50": {
+                        "base": "lukumäärä",
+                        "decimals": 0
+                    },
+                    "TYOTTOMATULK": {
+                        "base": "lukumäärä",
+                        "decimals": 0
+                    },
+                    "UUDETAVP": {
+                        "base": "lukumäärä",
+                        "decimals": 0
+                    }
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        }
+    },
+    "extension": {
+        "noteMandatory": {
+            "0": true
+        },
+        "px": {
+            "tableid": "statfin_tyonv_pxt_12r5",
+            "decimals": 0,
+            "official-statistics": true,
+            "aggregallowed": true,
+            "language": "fi",
+            "description": "12r5 -- Työttömät työnhakijat eri ryhmissä, palveluissa olevat ja avoimet työpaikat kuukauden lopussa (1001), 2007M01-2025M04",
+            "matrix": "001_12r5_2025",
+            "subject-code": "tym"
+        },
+        "contact": [
+            {
+                "raw": "#<A HREF='https://stat.fi/tilasto/tyonv' TARGET=_blank>Tilaston kotisivu</A>"
+            }
+        ]
+    },
+    "value": [
+        8600,
+        10.9,
+        208,
+        1039,
+        3360,
+        964,
+        1227,
+        8362,
+        10.6,
+        207,
+        990,
+        3277,
+        941,
+        1011,
+        13623,
+        14.7,
+        326,
+        1524,
+        5410,
+        1495,
+        1053,
+        13083,
+        14.1,
+        305,
+        1425,
+        5248,
+        1445,
+        1023
+    ]
+}

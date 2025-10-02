@@ -1,0 +1,393 @@
+{
+    "version": "2.0",
+    "class": "dataset",
+    "label": "12tw -- Avoimet työpaikat kuukauden lopussa toimialan mukaan maakunnittain (2206) muuttujina Alue, Toimiala, Työnantajan sektori, Työpaikan työn kesto, Kuukausi ja Tiedot",
+    "source": "KEHA-keskus, Työnvälitystilasto",
+    "updated": "2025-08-26T05:00:00Z",
+    "note": [
+        "\r\n<A HREF='https://stat.fi/tilasto/dokumentaatio/tyonv' TARGET=_blank>Tilaston kuvaus</A>",
+        "... = Tieto on salassapitosäännön alainen"
+    ],
+    "role": {
+        "time": [
+            "Kuukausi"
+        ],
+        "geo": [
+            "Alue"
+        ],
+        "metric": [
+            "Tiedot"
+        ]
+    },
+    "id": [
+        "Alue",
+        "Toimiala",
+        "Työnantajan sektori",
+        "Työpaikan työn kesto",
+        "Kuukausi",
+        "Tiedot"
+    ],
+    "size": [
+        3,
+        21,
+        1,
+        1,
+        2,
+        1
+    ],
+    "dimension": {
+        "Alue": {
+            "label": "Alue",
+            "category": {
+                "index": {
+                    "SSS": 0,
+                    "MK05": 1,
+                    "MK07": 2
+                },
+                "label": {
+                    "SSS": "KOKO MAA",
+                    "MK05": "MK05 Kanta-Häme",
+                    "MK07": "MK07 Päijät-Häme"
+                }
+            },
+            "extension": {
+                "elimination": true,
+                "eliminationValueCode": "SSS",
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Alue": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Toimiala": {
+            "label": "Toimiala",
+            "category": {
+                "index": {
+                    "A": 0,
+                    "B": 1,
+                    "C": 2,
+                    "D": 3,
+                    "E": 4,
+                    "F": 5,
+                    "G": 6,
+                    "H": 7,
+                    "I": 8,
+                    "J": 9,
+                    "K": 10,
+                    "L": 11,
+                    "M": 12,
+                    "N": 13,
+                    "O": 14,
+                    "P": 15,
+                    "Q": 16,
+                    "R": 17,
+                    "S": 18,
+                    "T": 19,
+                    "U": 20
+                },
+                "label": {
+                    "A": "A Maatalous, metsätalous ja kalatalous",
+                    "B": "B Kaivostoiminta ja louhinta",
+                    "C": "C Teollisuus",
+                    "D": "D Sähkö-, kaasu- ja lämpöhuolto, jäähdytysliiketoiminta",
+                    "E": "E Vesihuolto, viemäri- ja jätevesihuolto, jätehuolto ja muu ympäristön puhtaanapito",
+                    "F": "F Rakentaminen",
+                    "G": "G Tukku- ja vähittäiskauppa; moottoriajoneuvojen ja moottoripyörien korjaus",
+                    "H": "H Kuljetus ja varastointi",
+                    "I": "I Majoitus- ja ravitsemistoiminta",
+                    "J": "J Informaatio ja viestintä",
+                    "K": "K Rahoitus- ja vakuutustoiminta",
+                    "L": "L Kiinteistöalan toiminta",
+                    "M": "M Ammatillinen, tieteellinen ja tekninen toiminta",
+                    "N": "N Hallinto- ja tukipalvelutoiminta",
+                    "O": "O Julkinen hallinto ja maanpuolustus; pakollinen sosiaalivakuutus",
+                    "P": "P Koulutus",
+                    "Q": "Q Terveys- ja sosiaalipalvelut",
+                    "R": "R Taiteet, viihde ja virkistys",
+                    "S": "S Muu palvelutoiminta",
+                    "T": "T Kotitalouksien toiminta työnantajina; kotitalouksien eriyttämätön toiminta tavaroiden ja palvelujen tuottamiseksi omaan käyttöön",
+                    "U": "U Kansainvälisten organisaatioiden ja toimielinten toiminta"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Toimiala": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Työnantajan sektori": {
+            "label": "Työnantajan sektori",
+            "category": {
+                "index": {
+                    "SSS": 0
+                },
+                "label": {
+                    "SSS": "Yhteensä"
+                }
+            },
+            "extension": {
+                "elimination": true,
+                "eliminationValueCode": "SSS",
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Työnantajan sektori": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Työpaikan työn kesto": {
+            "label": "Työpaikan työn kesto",
+            "category": {
+                "index": {
+                    "SSS": 0
+                },
+                "label": {
+                    "SSS": "Yhteensä"
+                }
+            },
+            "extension": {
+                "elimination": true,
+                "eliminationValueCode": "SSS",
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Työpaikan työn kesto": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Kuukausi": {
+            "label": "Kuukausi",
+            "category": {
+                "index": {
+                    "2025M06": 0,
+                    "2025M07": 1
+                },
+                "label": {
+                    "2025M06": "2025M06",
+                    "2025M07": "2025M07"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        },
+        "Tiedot": {
+            "label": "Tiedot",
+            "category": {
+                "index": {
+                    "AVPAIKATLOPUSSA": 0
+                },
+                "label": {
+                    "AVPAIKATLOPUSSA": "Avoimet työpaikat kuukauden laskentapäivänä (lkm.)"
+                },
+                "note": {
+                    "AVPAIKATLOPUSSA": [
+                        "TE-toimistoihin ilmoitetut avoimet työpaikat kuukauden laskentapäivänä"
+                    ]
+                },
+                "unit": {
+                    "AVPAIKATLOPUSSA": {
+                        "base": "lukumäärä",
+                        "decimals": 0
+                    }
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        }
+    },
+    "extension": {
+        "px": {
+            "tableid": "statfin_tyonv_pxt_12tw",
+            "decimals": 0,
+            "official-statistics": true,
+            "aggregallowed": true,
+            "language": "fi",
+            "description": "12tw -- Avoimet työpaikat kuukauden lopussa toimialan mukaan maakunnittain (2206), 2008M01-2025M07",
+            "matrix": "024_12tw_2025",
+            "subject-code": "tym"
+        },
+        "contact": [
+            {
+                "raw": "#<A HREF='https://stat.fi/tilasto/tyonv' TARGET=_blank>Tilaston kotisivu</A>"
+            }
+        ]
+    },
+    "value": [
+        288,
+        195,
+        7,
+        21,
+        558,
+        661,
+        13,
+        19,
+        83,
+        91,
+        697,
+        832,
+        943,
+        1172,
+        571,
+        695,
+        991,
+        1098,
+        81,
+        117,
+        32,
+        50,
+        74,
+        80,
+        1011,
+        814,
+        14140,
+        12981,
+        2820,
+        2793,
+        269,
+        266,
+        3059,
+        3125,
+        317,
+        436,
+        625,
+        647,
+        36,
+        36,
+        null,
+        null,
+        7,
+        6,
+        0,
+        0,
+        32,
+        22,
+        0,
+        0,
+        15,
+        17,
+        null,
+        null,
+        18,
+        20,
+        13,
+        10,
+        20,
+        18,
+        null,
+        null,
+        0,
+        null,
+        null,
+        null,
+        5,
+        8,
+        284,
+        237,
+        51,
+        62,
+        12,
+        24,
+        103,
+        108,
+        null,
+        8,
+        15,
+        15,
+        null,
+        null,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        7,
+        9,
+        0,
+        0,
+        null,
+        null,
+        null,
+        7,
+        24,
+        16,
+        22,
+        36,
+        16,
+        16,
+        5,
+        null,
+        0,
+        0,
+        null,
+        null,
+        20,
+        15,
+        212,
+        223,
+        51,
+        87,
+        null,
+        7,
+        84,
+        100,
+        5,
+        0,
+        8,
+        11,
+        5,
+        null,
+        0,
+        0
+    ],
+    "status": {
+        "40": "...",
+        "41": "...",
+        "52": "...",
+        "53": "...",
+        "60": "...",
+        "61": "...",
+        "63": "...",
+        "64": "...",
+        "65": "...",
+        "76": "...",
+        "80": "...",
+        "81": "...",
+        "92": "...",
+        "93": "...",
+        "94": "...",
+        "103": "...",
+        "106": "...",
+        "107": "...",
+        "114": "...",
+        "123": "..."
+    }
+}

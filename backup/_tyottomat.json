@@ -1,0 +1,36 @@
+{
+  "query": [
+    {
+      "code": "Kuukausi",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "2024M09",
+          "2024M10"
+        ]
+      }
+    },
+    {
+      "code": "Sukupuoli",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS"
+        ]
+      }
+    },
+    {
+      "code": "Ikäluokka",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "15-74",
+          "15-24"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}

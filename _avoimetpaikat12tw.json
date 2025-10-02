@@ -1,0 +1,95 @@
+{
+  "query": [
+    {
+      "code": "Alue",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS",
+          "MK05",
+          "MK07"
+        ]
+      }
+    },
+    {
+      "code": "Toimiala",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "I",
+          "J",
+          "K",
+          "L",
+          "M",
+          "N",
+          "O",
+          "P",
+          "Q",
+          "R",
+          "S",
+          "T",
+          "U"
+        ]
+      }
+    },
+    {
+      "code": "Työnantajan sektori",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS"
+        ]
+      }
+    },
+    {
+      "code": "Työpaikan työn kesto",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS"
+        ]
+      }
+    },
+    {
+      "code": "Kuukausi",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "2024M07",
+          "2024M08",
+          "2024M09",
+          "2024M10",
+          "2024M11",
+          "2024M12",
+          "2025M01",
+          "2025M02",
+          "2025M03",
+          "2025M04",
+          "2025M05",
+          "2025M06",
+          "2025M07"
+        ]
+      }
+    },
+    {
+      "code": "Tiedot",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "AVPAIKATLOPUSSA"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}
