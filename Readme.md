@@ -38,5 +38,22 @@ Ohjelmat voidaan ajastaa Linux-palvelimella ajettavaksi automaattisesti esimerki
 - Yhteys Tilastokeskuksen PxWeb API:in
 - Oikeat tietokantataulut ja -rakenne (katso kunkin skriptin kommentit)
 
+## Kehitysympäristön ja versionhallinnan työkalut
+
+- **GitHub Desktop**: Helppo graafinen käyttöliittymä versionhallintaan ja projektin synkronointiin GitHubiin.
+- **Visual Studio Code (VS Code)**: Suositeltu editori PHP/Node.js-kehitykseen, tukee mm. etäyhteyksiä ja versionhallintaa.
+- **SSH-yhteys palvelimelle**: Tarvitset SSH-yhteyden (esim. PuTTY, OpenSSH, VS Code Remote SSH) ohjelmien siirtoon ja ajamiseen palvelimella.
+- **Palvelimella** phpMyAdmin: Tietokannan hallintaan ja tarkasteluun.
+- **Linux-palvelin Domaintohelli** : Ajastettu ajo (crontab) ja PHP-ohjelmien suoritus.
+
+### Esimerkkityökalujen asennus
+- [GitHub Desktop](https://desktop.github.com/)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [PuTTY (Windows SSH)](https://www.putty.org/)
+
+### Vinkit
+- Pidä projektin tiedostot versionhallinnassa (GitHub), jotta muutokset ja varmuuskopiot säilyvät.
+- Testaa skriptit ensin paikallisesti, ennen kuin ajastat ne tuotantopalvelimelle.
+
 ## Yhteystiedot
-Lisätietoja: [Tilastokeskus PxWeb API](https://stat.fi/tilastot/pxweb)
+Lisätietoja tilasto-rajapinnoista: [Tilastokeskus PxWeb API](https://stat.fi/tilastot/pxweb)
