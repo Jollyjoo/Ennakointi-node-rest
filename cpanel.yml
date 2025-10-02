@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/catbxjbt/public_html/cgi-bin
+    - export DEPLOYPATH=/home/catbxjbt/public_html/cgi-bin/
     - /bin/cp fetchVaesto_11re.php $DEPLOYPATH
     - /bin/cp fetchVierasKieliset_11c4.php $DEPLOYPATH
     - /bin/cp fetchTyottomat_12r5.php $DEPLOYPATH
