@@ -14,4 +14,3 @@ deployment:
     - /bin/cp _vaesto_11re.json $DEPLOYPATH
     - /bin/cp _valmistuneet_12bs.json $DEPLOYPATH
     - /bin/cp _vieraskiel_11c4.json $DEPLOYPATH
-    - /bin/cp db.php $DEPLOYPATH
