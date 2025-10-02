@@ -21,16 +21,16 @@ Ohjelmat voidaan ajastaa Linux-palvelimella ajettavaksi automaattisesti esimerki
    ```
 2. Lisää rivi jokaista ajettavaa ohjelmaa varten, esim. joka päivä klo 04:07:
    ```
-   7 4 * * * php /polku/projektiin/fetchVaesto_11re.php
-   7 4 * * * php /polku/projektiin/fetchVierasKieliset_11c4.php
-   7 4 * * * php /polku/projektiin/fetchTyottomat_12r5.php
-   7 4 * * * php /polku/projektiin/fetchAlueenTyopaikat_115h.php
-   7 4 * * * php /polku/projektiin/fetchavoimetpaikat12tw.php
-   7 4 * * * php /polku/projektiin/fetchValmistuneet_12bs.php
+   7 4 * * * php /public_html/cgi-bin/fetchVaesto_11re.php
+   7 4 * * * php /public_html/cgi-bin/fetchVierasKieliset_11c4.php
+   7 4 * * * php /public_html/cgi-bin/fetchTyottomat_12r5.php
+   7 4 * * * php /public_html/cgi-bin/fetchAlueenTyopaikat_115h.php
+   7 4 * * * php /public_html/cgi-bin/fetchavoimetpaikat12tw.php
+   7 4 * * * php /public_html/cgi-bin/fetchValmistuneet_12bs.php
    ```
-   Vaihda `/polku/projektiin/` oikeaksi hakemistopoluksi.
-
-3. Tallenna ja sulje crontab (esim. nano: Ctrl+O, Enter, Ctrl+X).
+   Vaihda `/polku/projektiin/` tarvittaessa oikeaksi hakemistopoluksi.
+3.1 Muokkaa tiedostoa: i (insert)
+3. Tallenna ja sulje crontab (esim. Esc , :wq (Write-Quit) , Enter .
 
 ## Vaatimukset
 - PHP (vähintään 7.x)
