@@ -6,6 +6,11 @@
         "filter": "agg:_Maakunnat ja kunnat 2023.agg",
         "values": [
           "SSS",
+          "MK01",
+          "KU091",
+          "ELY04",
+          "ELY05",
+          "ELY06",
           "MK05",
           "KU061",
           "KU082",
