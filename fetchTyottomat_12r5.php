@@ -145,7 +145,7 @@ function main() {
             $alueLabel = isset($alueLabels[$alueId]) ? $alueLabels[$alueId] : $alueId;
             // Hae maakunta_ID kunta-taulusta stat_code:n perusteella
             $maakunta_ID = null;
-            $mkQuery = "SELECT maakunta_ID FROM kunta WHERE stat_code = ? LIMIT 1";
+            $mkQuery = "SELECT maakunta_ID FROM Kunta WHERE stat_code = ? LIMIT 1";
             $mkStmt = $conn->prepare($mkQuery);
             if ($mkStmt) {
                 $mkStmt->bind_param("s", $alueId);
