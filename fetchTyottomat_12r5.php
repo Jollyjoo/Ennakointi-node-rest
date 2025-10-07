@@ -63,7 +63,7 @@ function logMessage($message) {
 }
 
 // Funktio, joka generoi viimeisimmät N kuukautta (mukaan lukien viimeisin kuukausi)
-function getRecentKuukaudet($n = 50) {
+function getRecentKuukaudet($n = 5) {
     $months = [];
     $base = strtotime(date('Y-m-01')); // Ensimmäinen päivä kuluvasta kuukaudesta
     for ($i = 1; $i <= $n; $i++) {
@@ -81,7 +81,7 @@ function main() {
         $jsonArray = json_decode(file_get_contents($jsonFile), true);
 
         // Päivitetään Kuukausi-arvot viimeisimmille 5 kuukaudelle
-        $recentKuukaudet = getRecentKuukaudet(50);
+        $recentKuukaudet = getRecentKuukaudet(5);
         foreach ($jsonArray['query'] as &$query) {
             if ($query['code'] === 'Kuukausi') {
                 $query['selection']['values'] = $recentKuukaudet;
