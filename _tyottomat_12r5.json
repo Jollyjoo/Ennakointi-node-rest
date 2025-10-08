@@ -59,8 +59,9 @@
           "TYOTTOMAT25",
           "TYOTTOMAT50",
           "TYOTTOMATULK",
-          "UUDETAVP",
-          "PITKAAIKAISTYOTTOMAT"
+          "PITKAAIKAISTYOTTOMAT",
+          "UUDETAVP"
+          
         ]
       }
     }
