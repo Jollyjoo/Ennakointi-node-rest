@@ -194,14 +194,14 @@ function main() {
                     $updateStmt->close();
                 } else {
                     // Debug: log all insert params
-                    logMessage("INSERT PARAMS: maakunta_ID=$maakunta_ID, aika=$aika, tyottomatlopussa=$tyottomatlopussa, tyotosuus=$tyotosuus, tyottomat20=$tyottomat20, tyottomat25=$tyottomat25, tyottomat50=$tyottomat50, tyottomatulk=$tyottomatulk, uudetavp=$uudetavp, stat_code=$alueId, stat_label=$alueLabel, pitkaaikaistyottomat=$pitkaaikaistyottomat");
+                    logMessage("INSERT PARAMS: maakunta_ID=$maakunta_ID, aika=$aika, tyottomatlopussa=$tyottomatlopussa, tyotosuus=$tyotosuus, tyottomat20=$tyottomat20, tyottomat25=$tyottomat25, tyottomat50=$tyottomat50, tyottomatulk=$tyottomatulk, uudetavp=$uudetavp, stat_label=$alueLabel, pitkaaikaistyottomat=$pitkaaikaistyottomat, stat_code=$alueId");
                     // Lisätään uusi tietue
-                    $query = "INSERT INTO Tyonhakijat (Maakunta_ID, Aika, tyottomatlopussa, tyotosuus, tyottomat20, tyottomat25, tyottomat50, tyottomatulk, uudetavp, stat_code, stat_label, pitkaaikaistyottomat, stat_update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                    $query = "INSERT INTO Tyonhakijat (Maakunta_ID, Aika, tyottomatlopussa, tyotosuus, tyottomat20, tyottomat25, tyottomat50, tyottomatulk, uudetavp, stat_label, pitkaaikaistyottomat, stat_code, stat_update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                     $stmt = $conn->prepare($query);
                     if (!$stmt) {
                         throw new Exception("Virhe SQL-lauseen valmistelussa: " . $conn->error);
                     }
-                    $stmt->bind_param("isidddddddss", $maakunta_ID, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueId, $alueLabel, $pitkaaikaistyottomat);
+                    $stmt->bind_param("isidddddddsss", $maakunta_ID, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueLabel, $pitkaaikaistyottomat, $alueId);
                     if (!$stmt->execute()) {
                         throw new Exception("Virhe SQL-lauseen suorittamisessa: " . $stmt->error);
                     }
