@@ -179,6 +179,8 @@ function main() {
                 $checkStmt->close();
 
                 if ($count > 0) {
+                    // Debug: log stat_code, stat_label, aika before update
+                    logMessage("UPDATE: stat_code=$alueId, stat_label=$alueLabel, aika=$aika");
                     // Päivitetään olemassa oleva tietue
                     $updateQuery = "UPDATE Tyonhakijat SET maakunta_ID=?, tyottomatlopussa=?, tyotosuus=?, tyottomat20=?, tyottomat25=?, tyottomat50=?, tyottomatulk=?, uudetavp=?, stat_label=?, pitkaaikaistyottomat=?, stat_update_date=NOW() WHERE stat_code=? AND aika=?";
                     $updateStmt = $conn->prepare($updateQuery);
@@ -191,6 +193,8 @@ function main() {
                     }
                     $updateStmt->close();
                 } else {
+                    // Debug: log stat_code, stat_label, aika before insert
+                    logMessage("INSERT: stat_code=$alueId, stat_label=$alueLabel, aika=$aika");
                     // Lisätään uusi tietue
                     $query = "INSERT INTO Tyonhakijat (Maakunta_ID, Aika, tyottomatlopussa, tyotosuus, tyottomat20, tyottomat25, tyottomat50, tyottomatulk, uudetavp, stat_code, stat_label, pitkaaikaistyottomat, stat_update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                     $stmt = $conn->prepare($query);
