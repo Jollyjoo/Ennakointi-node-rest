@@ -63,7 +63,7 @@ function logMessage($message) {
 }
 
 // Funktio, joka generoi viimeisimmät N kuukautta (mukaan lukien viimeisin kuukausi)
-function getRecentKuukaudet($n = 5) {
+function getRecentKuukaudet($n = 50) {
     $months = [];
     $base = strtotime(date('Y-m-01')); // Ensimmäinen päivä kuluvasta kuukaudesta
     for ($i = 1; $i <= $n; $i++) {
@@ -81,7 +81,7 @@ function main() {
         $jsonArray = json_decode(file_get_contents($jsonFile), true);
 
         // Päivitetään Kuukausi-arvot viimeisimmille 5 kuukaudelle
-        $recentKuukaudet = getRecentKuukaudet(5);
+        $recentKuukaudet = getRecentKuukaudet(50);
         foreach ($jsonArray['query'] as &$query) {
             if ($query['code'] === 'Kuukausi') {
                 $query['selection']['values'] = $recentKuukaudet;
@@ -180,12 +180,12 @@ function main() {
 
                 if ($count > 0) {
                     // Päivitetään olemassa oleva tietue
-                    $updateQuery = "UPDATE Tyonhakijat SET maakunta_ID=?, tyottomatlopussa=?, tyotosuus=?, tyottomat20=?, tyottomat25=?, tyottomat50=?, tyottomatulk=?, uudetavp=?, stat_code=?, stat_label=?, pitkaaikaistyottomat=?, stat_update_date=NOW() WHERE aika=?";
+                    $updateQuery = "UPDATE Tyonhakijat SET maakunta_ID=?, tyottomatlopussa=?, tyotosuus=?, tyottomat20=?, tyottomat25=?, tyottomat50=?, tyottomatulk=?, uudetavp=?, stat_label=?, pitkaaikaistyottomat=?, stat_update_date=NOW() WHERE stat_code=? AND aika=?";
                     $updateStmt = $conn->prepare($updateQuery);
                     if (!$updateStmt) {
                         throw new Exception("Virhe SQL-päivityslauseen valmistelussa: " . $conn->error);
                     }
-                    $updateStmt->bind_param("idddddddssds", $maakunta_ID, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueId, $alueLabel, $pitkaaikaistyottomat, $aika);
+                    $updateStmt->bind_param("idddddddssds", $maakunta_ID, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueLabel, $pitkaaikaistyottomat, $alueId, $aika);
                     if (!$updateStmt->execute()) {
                         throw new Exception("Virhe SQL-päivityslauseen suorittamisessa: " . $updateStmt->error);
                     }
