@@ -197,7 +197,7 @@ function main() {
                     if (!$stmt) {
                         throw new Exception("Virhe SQL-lauseen valmistelussa: " . $conn->error);
                     }
-                    $stmt->bind_param("isidddddddsss", $maakunta_ID, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueId, $alueLabel, $pitkaaikaistyottomat);
+                    $stmt->bind_param("isidddddddss", $maakunta_ID, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueId, $alueLabel, $pitkaaikaistyottomat);
                     if (!$stmt->execute()) {
                         throw new Exception("Virhe SQL-lauseen suorittamisessa: " . $stmt->error);
                     }
