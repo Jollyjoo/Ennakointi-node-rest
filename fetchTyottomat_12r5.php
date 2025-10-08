@@ -185,7 +185,7 @@ function main() {
                     if (!$updateStmt) {
                         throw new Exception("Virhe SQL-päivityslauseen valmistelussa: " . $conn->error);
                     }
-                    $updateStmt->bind_param("isdddddddddds", $maakunta_ID, $alueLabel, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp, $alueId, $aika);
+                    $updateStmt->bind_param("isddddddddds", $maakunta_ID, $alueLabel, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp, $alueId, $aika);
                     if (!$updateStmt->execute()) {
                         throw new Exception("Virhe SQL-päivityslauseen suorittamisessa: " . $updateStmt->error);
                     }
