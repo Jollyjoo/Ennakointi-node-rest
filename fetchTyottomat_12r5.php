@@ -185,7 +185,7 @@ function main() {
                     if (!$updateStmt) {
                         throw new Exception("Virhe SQL-päivityslauseen valmistelussa: " . $conn->error);
                     }
-                    $updateStmt->bind_param("isddddddddss", $maakunta_ID, $alueLabel, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $pitkaaikaistyottomat, $alueId, $aika);
+                    $updateStmt->bind_param("isdddddddddds", $maakunta_ID, $alueLabel, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $pitkaaikaistyottomat, $alueId, $aika);
                     if (!$updateStmt->execute()) {
                         throw new Exception("Virhe SQL-päivityslauseen suorittamisessa: " . $updateStmt->error);
                     }
@@ -197,7 +197,7 @@ function main() {
                     if (!$stmt) {
                         throw new Exception("Virhe SQL-lauseen valmistelussa: " . $conn->error);
                     }
-                    $stmt->bind_param("isssddddddd", $maakunta_ID, $alueId, $alueLabel, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $pitkaaikaistyottomat);
+                    $stmt->bind_param("isssdddddddd", $maakunta_ID, $alueId, $alueLabel, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $pitkaaikaistyottomat);
                     if (!$stmt->execute()) {
                         throw new Exception("Virhe SQL-lauseen suorittamisessa: " . $stmt->error);
                     }
