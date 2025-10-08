@@ -180,24 +180,24 @@ function main() {
 
                 if ($count > 0) {
                     // Päivitetään olemassa oleva tietue
-                    $updateQuery = "UPDATE Tyonhakijat SET maakunta_ID=?, stat_label=?, tyottomatlopussa=?, tyotosuus=?, tyottomat20=?, tyottomat25=?, tyottomat50=?, tyottomatulk=?, pitkaaikaistyottomat=?, uudetavp=?, stat_update_date=NOW() WHERE stat_code=? AND aika=?";
+                    $updateQuery = "UPDATE Tyonhakijat SET maakunta_ID=?, tyottomatlopussa=?, tyotosuus=?, tyottomat20=?, tyottomat25=?, tyottomat50=?, tyottomatulk=?, uudetavp=?, stat_code=?, stat_label=?, pitkaaikaistyottomat=?, stat_update_date=NOW() WHERE aika=?";
                     $updateStmt = $conn->prepare($updateQuery);
                     if (!$updateStmt) {
                         throw new Exception("Virhe SQL-päivityslauseen valmistelussa: " . $conn->error);
                     }
-                    $updateStmt->bind_param("isddddddddds", $maakunta_ID, $alueLabel, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp, $alueId, $aika);
+                    $updateStmt->bind_param("idddddddssds", $maakunta_ID, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueId, $alueLabel, $pitkaaikaistyottomat, $aika);
                     if (!$updateStmt->execute()) {
                         throw new Exception("Virhe SQL-päivityslauseen suorittamisessa: " . $updateStmt->error);
                     }
                     $updateStmt->close();
                 } else {
                     // Lisätään uusi tietue
-                    $query = "INSERT INTO Tyonhakijat (maakunta_ID, stat_code, stat_label, aika, tyottomatlopussa, tyotosuus, tyottomat20, tyottomat25, tyottomat50, tyottomatulk, pitkaaikaistyottomat, uudetavp, stat_update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                    $query = "INSERT INTO Tyonhakijat (Maakunta_ID, Aika, tyottomatlopussa, tyotosuus, tyottomat20, tyottomat25, tyottomat50, tyottomatulk, uudetavp, stat_code, stat_label, pitkaaikaistyottomat, stat_update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                     $stmt = $conn->prepare($query);
                     if (!$stmt) {
                         throw new Exception("Virhe SQL-lauseen valmistelussa: " . $conn->error);
                     }
-                    $stmt->bind_param("isssdddddddd", $maakunta_ID, $alueId, $alueLabel, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp);
+                    $stmt->bind_param("isidddddddsd", $maakunta_ID, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $uudetavp, $alueId, $alueLabel, $pitkaaikaistyottomat);
                     if (!$stmt->execute()) {
                         throw new Exception("Virhe SQL-lauseen suorittamisessa: " . $stmt->error);
                     }
