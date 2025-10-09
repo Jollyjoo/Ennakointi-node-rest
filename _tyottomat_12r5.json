@@ -60,7 +60,12 @@
           "TYOTTOMAT50",
           "TYOTTOMATULK",
           "PITKAAIKAISTYOTTOMAT",
-          "UUDETAVP"          
+          "UUDETAVP",
+          "TYOLLISTETTYLOP",
+          "KOKEILULOP",
+          "TVKOULUTUSLOP",
+          "VALMENNUSLOP",
+          "MTPPALVELUTLOP"
         ]
       }
     }

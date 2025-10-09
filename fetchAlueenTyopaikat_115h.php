@@ -114,7 +114,7 @@ function main() {
         $success = false;
         for ($try = $maxTries; $try >= 1; $try--) {
             $monthsToTry = array_slice($recentKuukaudet, 0, $try); // Pudotetaan uusin kuukausi pois joka yrityksellä
-            logMessage("Yritetään hakea kuukausille: " . implode(",", $monthsToTry));
+            //logMessage("Yritetään hakea kuukausille: " . implode(",", $monthsToTry));
             foreach ($jsonArray['query'] as &$query) {
                 if ($query['code'] === 'Kuukausi') {
                     $query['selection']['values'] = $monthsToTry;
@@ -124,7 +124,7 @@ function main() {
             $newStatData = $jsonArray;
             try {
                 $data = fetchData($apiUrl, $newStatData);
-                logMessage("API-vastaus saatu kuukausille: " . implode(",", $monthsToTry));
+                //logMessage("API-vastaus saatu kuukausille: " . implode(",", $monthsToTry));
                 $success = true;
                 break; // Onnistui, poistutaan silmukasta
             } catch (Exception $apiEx) {
