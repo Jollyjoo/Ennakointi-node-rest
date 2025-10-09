@@ -75,9 +75,9 @@ function main() {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // value-taulukko on järjestyksessä: for each Alue, Kuukausi, Tiedot
         for ($i = 0; $i < $alueCount; $i++) {
-            $alueId = $alueKeys[$i];
+            $alueId = trim($alueKeys[$i]);
             for ($j = 0; $j < $kuukausiCount; $j++) {
-                $kuukausi = $kuukausiKeys[$j];
+                $kuukausi = trim($kuukausiKeys[$j]);
                 $kuluttajienluottamus = null;
                 $omatalous = null;
                 $kuluttajahinnat = null;
