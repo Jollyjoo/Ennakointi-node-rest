@@ -97,25 +97,11 @@ function main() {
                 if ($kuluttajienluottamus === null && $omatalous === null && $kuluttajahinnat === null && $tyottomyydenuhka === null) {
                     continue;
                 }
-                // Tarkista onko tietue jo olemassa
-                $checkQuery = "SELECT COUNT(*) as cnt FROM Talous WHERE stat_code = ? AND kuukausi = ?";
-                $checkStmt = $pdo->prepare($checkQuery);
-                $checkStmt->execute([$alueId, $kuukausi]);
-                $checkRow = $checkStmt->fetch(PDO::FETCH_ASSOC);
-                $count = $checkRow ? intval($checkRow['cnt']) : 0;
                 $now = date('Y-m-d H:i:s');
-                logMessage("DEBUG: stat_code='$alueId', kuukausi='$kuukausi', count=$count");
-                if ($count > 0) {
-                    logMessage("DEBUG: UPDATE for stat_code='$alueId', kuukausi='$kuukausi'");
-                    $updateQuery = "UPDATE Talous SET kuluttajienluottamus=?, omatalous=?, kuluttajahinnat=?, tyottomyydenuhka=?, timestamp=? WHERE stat_code=? AND kuukausi=?";
-                    $updateStmt = $pdo->prepare($updateQuery);
-                    $updateStmt->execute([$kuluttajienluottamus, $omatalous, $kuluttajahinnat, $tyottomyydenuhka, $now, $alueId, $kuukausi]);
-                } else {
-                    logMessage("DEBUG: INSERT for stat_code='$alueId', kuukausi='$kuukausi'");
-                    $insertQuery = "INSERT INTO Talous (stat_code, kuukausi, kuluttajienluottamus, omatalous, kuluttajahinnat, tyottomyydenuhka, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                    $insertStmt = $pdo->prepare($insertQuery);
-                    $insertStmt->execute([$alueId, $kuukausi, $kuluttajienluottamus, $omatalous, $kuluttajahinnat, $tyottomyydenuhka, $now]);
-                }
+                $insertQuery = "INSERT INTO Talous (stat_code, kuukausi, kuluttajienluottamus, omatalous, kuluttajahinnat, tyottomyydenuhka, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)\n" .
+                    "ON DUPLICATE KEY UPDATE kuluttajienluottamus=VALUES(kuluttajienluottamus), omatalous=VALUES(omatalous), kuluttajahinnat=VALUES(kuluttajahinnat), tyottomyydenuhka=VALUES(tyottomyydenuhka), timestamp=VALUES(timestamp)";
+                $insertStmt = $pdo->prepare($insertQuery);
+                $insertStmt->execute([$alueId, $kuukausi, $kuluttajienluottamus, $omatalous, $kuluttajahinnat, $tyottomyydenuhka, $now]);
             }
         }
         logMessage("Talous haettu ja tallennettu tietokantaan onnistuneesti.");
