@@ -165,7 +165,7 @@ function main() {
                 $tyottomat50 = isset($data['value'][$offset + 4]) ? $data['value'][$offset + 4] : null;
                 $tyottomatulk = isset($data['value'][$offset + 5]) ? $data['value'][$offset + 5] : null;
                 $pitkaaikaistyottomat = isset($data['value'][$offset + 6]) ? $data['value'][$offset + 6] : null;
-                $uudetavp = isset($data['value'][$offset + 6]) ? $data['value'][$offset + 6] : null;
+                $uudetavp = isset($data['value'][$offset + 7]) ? $data['value'][$offset + 6] : null;
                 // Tarkistetaan onko tietue jo olemassa tällä stat_code ja aika -arvolla
                 $checkQuery = "SELECT COUNT(*) FROM Tyonhakijat WHERE stat_code = ? AND aika = ?";
                 $checkStmt = $conn->prepare($checkQuery);
