@@ -30,9 +30,6 @@ Tietokantataulu Vieraskieliset rakenne:
 */
 
 
-
-
-
 // MySQL-tietokannan asetukset
 require_once __DIR__ . '/db.php';
 

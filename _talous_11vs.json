@@ -1,0 +1,39 @@
+{
+  "query": [
+    {
+      "code": "Alue",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS",
+          "SA2_MK01XPKS"
+        ]
+      }
+    },
+    {
+      "code": "Kuukausi",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "2025M08",
+          "2025M09"
+        ]
+      }
+    },
+    {
+      "code": "Tiedot",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "CCI_A1",
+          "CCI_B1",
+          "CCI_B5",
+          "CCI_B8"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+}

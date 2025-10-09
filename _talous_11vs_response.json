@@ -1,0 +1,161 @@
+{
+    "version": "2.0",
+    "class": "dataset",
+    "label": "Kuluttajien luottamus muuttujina Alue, Kuukausi ja Tiedot",
+    "source": "Tilastokeskus, kuluttajien luottamus",
+    "updated": "2025-09-29T05:00:00Z",
+    "note": [
+        "<A HREF='https://stat.fi/tilasto/dokumentaatio/kbar' TARGET=_blank>Tilaston dokumentaatio</A>"
+    ],
+    "role": {
+        "time": [
+            "Kuukausi"
+        ],
+        "geo": [
+            "Alue"
+        ],
+        "metric": [
+            "Tiedot"
+        ]
+    },
+    "id": [
+        "Alue",
+        "Kuukausi",
+        "Tiedot"
+    ],
+    "size": [
+        2,
+        2,
+        4
+    ],
+    "dimension": {
+        "Alue": {
+            "label": "Alue",
+            "category": {
+                "index": {
+                    "SSS": 0,
+                    "SA2_MK01XPKS": 1
+                },
+                "label": {
+                    "SSS": "KOKO MAA",
+                    "SA2_MK01XPKS": "SA2, MK01 pl. PKS Etelä-Suomi ml. Uusimaa pl. pääkaupunkiseutu"
+                }
+            },
+            "extension": {
+                "elimination": true,
+                "eliminationValueCode": "SSS",
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Alue": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Kuukausi": {
+            "label": "Kuukausi",
+            "category": {
+                "index": {
+                    "2025M08": 0,
+                    "2025M09": 1
+                },
+                "label": {
+                    "2025M08": "2025M08",
+                    "2025M09": "2025M09"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        },
+        "Tiedot": {
+            "label": "Tiedot",
+            "category": {
+                "index": {
+                    "CCI_A1": 0,
+                    "CCI_B1": 1,
+                    "CCI_B5": 2,
+                    "CCI_B8": 3
+                },
+                "label": {
+                    "CCI_A1": "A1 Kuluttajien luottamusindikaattori = (B1+B2+B4+E1)/4",
+                    "CCI_B1": "B1 Oma talous nyt (saldoluku)",
+                    "CCI_B5": "B5 Kuluttajahinnat nyt (Inflaatio-%)",
+                    "CCI_B8": "B8 Työttömyyden uhka omalla kohdalla nyt (saldoluku)"
+                },
+                "unit": {
+                    "CCI_A1": {
+                        "base": "Saldoluku",
+                        "decimals": 1
+                    },
+                    "CCI_B1": {
+                        "base": "Saldoluku",
+                        "decimals": 1
+                    },
+                    "CCI_B5": {
+                        "base": "%",
+                        "decimals": 1
+                    },
+                    "CCI_B8": {
+                        "base": "Saldoluku",
+                        "decimals": 1
+                    }
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        }
+    },
+    "extension": {
+        "px": {
+            "tableid": "statfin_kbar_pxt_11vs",
+            "decimals": 1,
+            "official-statistics": true,
+            "aggregallowed": true,
+            "language": "fi",
+            "contents": "Kuluttajien luottamus",
+            "description": "11vs -- Kuluttajien luottamus alueittain, 2019M05-2025M09",
+            "descriptiondefault": false,
+            "heading": [
+                "Tiedot"
+            ],
+            "stub": [
+                "Alue",
+                "Kuukausi"
+            ],
+            "matrix": "001_11vs_2025m09",
+            "subject-code": "KBAR",
+            "subject-area": "kbar"
+        },
+        "contact": [
+            {
+                "raw": "<A HREF='https://stat.fi/tilasto/kbar' TARGET=_blank>Tilaston kotisivu</A>"
+            }
+        ]
+    },
+    "value": [
+        -7.6,
+        -0.2,
+        4.8,
+        -13.3,
+        -6.6,
+        -0.6,
+        4.6,
+        -12.5,
+        -10.6,
+        -6.5,
+        4.8,
+        -13,
+        -7.1,
+        -1.3,
+        4.8,
+        -11.9
+    ]
+}
