@@ -174,8 +174,7 @@ function main() {
                 $tvkoulutuslop = isset($tiedot_map['TVKOULUTUSLOP']) ? (int)$data['value'][$offset + $tiedot_map['TVKOULUTUSLOP']] : 0;
                 $valmennuslop = isset($tiedot_map['VALMENNUSLOP']) ? (int)$data['value'][$offset + $tiedot_map['VALMENNUSLOP']] : 0;
                 $mtppalvelutlop = isset($tiedot_map['MTPPALVELUTLOP']) ? (int)$data['value'][$offset + $tiedot_map['MTPPALVELUTLOP']] : 0;
-                $palvelut_yht = $tyollistettylop + $kokeilulop + $tvkoulutuslop + $valmennuslop + $mtppalvelutlop;
-                //$palvelut_yht = $tyollistettylop ;
+                $palvelut_yht = $tyollistettylop + $kokeilulop + $tvkoulutuslop + $valmennuslop + $mtppalvelutlop;                
                 // Tarkistetaan onko tietue jo olemassa tällä stat_code ja aika -arvolla
                 $checkQuery = "SELECT COUNT(*) FROM Tyonhakijat WHERE stat_code = ? AND aika = ?";
                 $checkStmt = $conn->prepare($checkQuery);
