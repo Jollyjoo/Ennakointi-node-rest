@@ -63,7 +63,7 @@ function logMessage($message) {
 }
 
 // Funktio, joka generoi viimeisimmät N kuukautta (mukaan lukien viimeisin kuukausi)
-function getRecentKuukaudet($n = 50) {
+function getRecentKuukaudet($n = 5) {
     $months = [];
     $base = strtotime(date('Y-m-01')); // Ensimmäinen päivä kuluvasta kuukaudesta
     for ($i = 1; $i <= $n; $i++) {
@@ -81,7 +81,7 @@ function main() {
         $jsonArray = json_decode(file_get_contents($jsonFile), true);
 
         // Päivitetään Kuukausi-arvot viimeisimmille 5 kuukaudelle
-        $recentKuukaudet = getRecentKuukaudet(50);
+        $recentKuukaudet = getRecentKuukaudet(5);
         foreach ($jsonArray['query'] as &$query) {
             if ($query['code'] === 'Kuukausi') {
                 $query['selection']['values'] = $recentKuukaudet;
@@ -128,6 +128,8 @@ function main() {
         $alueKeys = array_keys($alueIndex);
         $kuukausiKeys = array_keys($kuukausiIndex);
         $tiedotKeys = array_keys($tiedotIndex);
+    // Build Tiedot code => index mapping for dynamic access
+    $tiedot_map = $tiedotIndex; // code => index
 
         // Yhdistetään MySQL-tietokantaan
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -158,20 +160,20 @@ function main() {
                 $kuukausi = $kuukausiKeys[$j];
                 $aika = $kuukausi;
                 $offset = ($i * $kuukausiCount + $j) * $tiedotCount;
-                $tyottomatlopussa = isset($data['value'][$offset]) ? $data['value'][$offset] : null;
-                $tyotosuus = isset($data['value'][$offset + 1]) ? $data['value'][$offset + 1] : null;
-                $tyottomat20 = isset($data['value'][$offset + 2]) ? $data['value'][$offset + 2] : null;
-                $tyottomat25 = isset($data['value'][$offset + 3]) ? $data['value'][$offset + 3] : null;
-                $tyottomat50 = isset($data['value'][$offset + 4]) ? $data['value'][$offset + 4] : null;
-                $tyottomatulk = isset($data['value'][$offset + 5]) ? $data['value'][$offset + 5] : null;
-                $pitkaaikaistyottomat = isset($data['value'][$offset + 6]) ? $data['value'][$offset + 6] : null;
-                $uudetavp = isset($data['value'][$offset + 7]) ? $data['value'][$offset + 7] : null;
-                // Sum the 5 new params for palvelut_yht
-                $tyollistettylop = isset($data['value'][$offset + 8]) ? (int)$data['value'][$offset + 8] : 0;
-                $kokeilulop = isset($data['value'][$offset + 9]) ? (int)$data['value'][$offset + 9] : 0;
-                $tvkoulutuslop = isset($data['value'][$offset + 10]) ? (int)$data['value'][$offset + 10] : 0;
-                $valmennuslop = isset($data['value'][$offset + 11]) ? (int)$data['value'][$offset + 11] : 0;
-                $mtppalvelutlop = isset($data['value'][$offset + 12]) ? (int)$data['value'][$offset + 12] : 0;
+                $tyottomatlopussa = isset($tiedot_map['TYOTTOMATLOPUSSA']) ? $data['value'][$offset + $tiedot_map['TYOTTOMATLOPUSSA']] : null;
+                $tyotosuus = isset($tiedot_map['TYOTOSUUS']) ? $data['value'][$offset + $tiedot_map['TYOTOSUUS']] : null;
+                $tyottomat20 = isset($tiedot_map['TYOTTOMAT20']) ? $data['value'][$offset + $tiedot_map['TYOTTOMAT20']] : null;
+                $tyottomat25 = isset($tiedot_map['TYOTTOMAT25']) ? $data['value'][$offset + $tiedot_map['TYOTTOMAT25']] : null;
+                $tyottomat50 = isset($tiedot_map['TYOTTOMAT50']) ? $data['value'][$offset + $tiedot_map['TYOTTOMAT50']] : null;
+                $tyottomatulk = isset($tiedot_map['TYOTTOMATULK']) ? $data['value'][$offset + $tiedot_map['TYOTTOMATULK']] : null;
+                $pitkaaikaistyottomat = isset($tiedot_map['PITKAAIKAISTYOTTOMAT']) ? $data['value'][$offset + $tiedot_map['PITKAAIKAISTYOTTOMAT']] : null;
+                $uudetavp = isset($tiedot_map['UUDETAVP']) ? $data['value'][$offset + $tiedot_map['UUDETAVP']] : null;
+                // Dynamically sum the 5 palvelut params
+                $tyollistettylop = isset($tiedot_map['TYOLLISTETTYLOP']) ? (int)$data['value'][$offset + $tiedot_map['TYOLLISTETTYLOP']] : 0;
+                $kokeilulop = isset($tiedot_map['KOKEILULOP']) ? (int)$data['value'][$offset + $tiedot_map['KOKEILULOP']] : 0;
+                $tvkoulutuslop = isset($tiedot_map['TVKOULUTUSLOP']) ? (int)$data['value'][$offset + $tiedot_map['TVKOULUTUSLOP']] : 0;
+                $valmennuslop = isset($tiedot_map['VALMENNUSLOP']) ? (int)$data['value'][$offset + $tiedot_map['VALMENNUSLOP']] : 0;
+                $mtppalvelutlop = isset($tiedot_map['MTPPALVELUTLOP']) ? (int)$data['value'][$offset + $tiedot_map['MTPPALVELUTLOP']] : 0;
                 $palvelut_yht = $tyollistettylop + $kokeilulop + $tvkoulutuslop + $valmennuslop + $mtppalvelutlop;
                 // Tarkistetaan onko tietue jo olemassa tällä stat_code ja aika -arvolla
                 $checkQuery = "SELECT COUNT(*) FROM Tyonhakijat WHERE stat_code = ? AND aika = ?";
