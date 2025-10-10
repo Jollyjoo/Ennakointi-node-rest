@@ -14,7 +14,7 @@ require_once __DIR__ . '/db.php';
 $apiUrl = 'https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/kbar/statfin_kbar_pxt_11vs.px';
 $jsonFile = '_talous_11vs.json';
 
-function getRecentMonths($n = 72) {
+function getRecentMonths($n = 12) {
     $months = [];
     $base = strtotime(date('Y-m-01'));
     for ($i = 1; $i <= $n; $i++) {
@@ -51,7 +51,7 @@ function main() {
     try {
         $jsonArray = json_decode(file_get_contents($jsonFile), true);
         // Päivitä Kuukausi-arvot viimeisimmille 12 kuukaudelle
-        $recentMonths = getRecentMonths(72);
+        $recentMonths = getRecentMonths(12);
         foreach ($jsonArray['query'] as &$query) {
             if ($query['code'] === 'Kuukausi') {
                 $query['selection']['values'] = $recentMonths;
