@@ -54,10 +54,7 @@
         "filter": "item",
         "values": [
           "2019",
-          "2020",
-          "2021",
-          "5 VIIMEISTÄ VUOTTA",
-          "PARSITAAN LENNOSSA"
+          "2020"
         ]
       }
     }
