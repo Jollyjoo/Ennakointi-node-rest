@@ -3,7 +3,7 @@
     {
       "code": "Alue",
       "selection": {
-        "filter": "agg:_Maakunnat ja kunnat 2023.agg",
+        "filter": "item",
         "values": [
           "SSS",
           "MK01",
