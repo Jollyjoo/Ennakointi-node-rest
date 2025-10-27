@@ -147,6 +147,33 @@ function main() {
                 $success = true;
                 break; // Onnistui, poistutaan silmukasta
             } catch (Exception $apiEx) {
+                // If we got a 400 Bad Request, try a fallback: convert any agg: filters with explicit values to 'item' and retry once.
+                $errMsg = $apiEx->getMessage();
+                logMessage("API first attempt failed: " . $errMsg);
+                if (stripos($errMsg, 'HTTP status 400') !== false || stripos($errMsg, 'Bad Request') !== false) {
+                    $retryData = $newStatData;
+                    $changed = false;
+                    foreach ($retryData['query'] as &$q) {
+                        if (isset($q['selection']['filter']) && is_string($q['selection']['filter']) && strpos($q['selection']['filter'], 'agg:') === 0 && !empty($q['selection']['values'])) {
+                            // convert to item
+                            $q['selection']['filter'] = 'item';
+                            $changed = true;
+                            logMessage("Falling back: converted agg filter to item for code={$q['code']}");
+                        }
+                    }
+                    unset($q);
+                    if ($changed) {
+                        try {
+                            logMessage('Retrying API call with converted filters...');
+                            $data = fetchData($apiUrl, $retryData);
+                            logMessage("API-vastaus saatu after retry for years: " . implode(",", $yearsToTry));
+                            $success = true;
+                            break;
+                        } catch (Exception $retryEx) {
+                            logMessage("Retry also failed: " . $retryEx->getMessage());
+                        }
+                    }
+                }
                 // Try to log the API response body if available
                 $errorContext = stream_context_create([
                     'http' => [
