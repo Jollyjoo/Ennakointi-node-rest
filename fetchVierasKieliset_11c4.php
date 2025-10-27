@@ -56,20 +56,40 @@ function fetchData($apiUrl, $postData) {
     // Määritellään HTTP POST -pyynnön asetukset
     $options = [
         'http' => [
-            'header'  => "Content-Type: application/json\r\n",
+            'header'  => "Content-Type: application/json\r\n" .
+                         "User-Agent: Ennakointi-fetch-script/1.0\r\n",
             'method'  => 'POST',
             'content' => json_encode($postData),
-            'timeout' => 10
+            'timeout' => 30,
+            // allow reading response body even on HTTP error (so we can log it)
+            'ignore_errors' => true
         ]
     ];
     $context  = stream_context_create($options);
-    // Lähetetään pyyntö ja otetaan vastaus talteen
-    $result = file_get_contents($apiUrl, false, $context);
-    if ($result === FALSE) {
-        throw new Exception("Virhe datan haussa API:sta");
+    // Lähetetään pyyntö ja otetaan vastaus talteen (palauttaa body myös virhekoodilla jos ignore_errors=true)
+    $result = @file_get_contents($apiUrl, false, $context);
+    $responseHeaders = isset($http_response_header) ? $http_response_header : [];
+    $statusLine = isset($responseHeaders[0]) ? $responseHeaders[0] : '';
+    if ($result === FALSE && empty($statusLine)) {
+        $err = error_get_last();
+        throw new Exception("Virhe datan haussa API:sta, file_get_contents failed: " . ($err['message'] ?? 'unknown'));
+    }
+    // tarkista HTTP-status
+    $status = 0;
+    if (preg_match('#HTTP/\d+\.\d+\s+(\d+)#', $statusLine, $m)) {
+        $status = intval($m[1]);
+    }
+    // Jos status ei ole 200, palauta virhe sisältäen body (jos saatavilla)
+    if ($status !== 200) {
+        $bodyPreview = is_string($result) ? substr($result, 0, 2000) : '';
+        throw new Exception("API HTTP status $status. Response body: " . $bodyPreview);
     }
     // Palautetaan dekoodattu JSON
-    return json_decode($result, true);
+    $decoded = json_decode($result, true);
+    if ($decoded === null) {
+        throw new Exception("Virhe JSON-dekodauksessa API-vastauksesta: " . substr($result ?? '', 0, 2000));
+    }
+    return $decoded;
 }
 
 // Funktio lokiviestien kirjoittamiseen tiedostoon
