@@ -109,7 +109,20 @@ function main() {
             throw new Exception("API failed for all recent months");
         }
 
-        // Parse the data
+    // Parse the data
+    // Get dataset-level updated timestamp and convert to MySQL DATETIME (Y-m-d H:i:s)
+    $stat_latest = isset($data['updated']) ? $data['updated'] : null;
+    if ($stat_latest) {
+        try {
+            $dt = new DateTime($stat_latest);
+            // Convert to server local time in 'Y-m-d H:i:s' format suitable for TIMESTAMP/DATETIME
+            $stat_latest = $dt->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            // If parsing fails, set to null and log
+            logMessage("WARNING: failed to parse stat_latest timestamp: " . $stat_latest);
+            $stat_latest = null;
+        }
+    }
         $alueIndex = $data['dimension']['Alue']['category']['index'];
         $alueLabels = $data['dimension']['Alue']['category']['label'];
         $vuosiIndex = $data['dimension']['Vuosi']['category']['index'];
@@ -156,24 +169,24 @@ function main() {
 
                 if ($count > 0) {
                     // Update existing record
-                    $updateQuery = "UPDATE Opiskelijat SET stat_label=?, perusjalk=?, toisenjalk=?, korkeajalk=?, stat_update_date=NOW() WHERE stat_code=? AND Vuosi=?";
+                    $updateQuery = "UPDATE Opiskelijat SET stat_label=?, perusjalk=?, toisenjalk=?, korkeajalk=?, stat_latest=?, stat_update_date=NOW() WHERE stat_code=? AND Vuosi=?";
                     $updateStmt = $conn->prepare($updateQuery);
                     if (!$updateStmt) {
                         throw new Exception("Error preparing update SQL statement: " . $conn->error);
                     }
-                    $updateStmt->bind_param("sddsss", $alueLabel, $perusjalk, $toisenjalk, $korkeajalk, $alueId, $vuosiId);
+                    $updateStmt->bind_param("sdddsss", $alueLabel, $perusjalk, $toisenjalk, $korkeajalk, $stat_latest, $alueId, $vuosiId);
                     if (!$updateStmt->execute()) {
                         throw new Exception("Error executing update SQL statement: " . $updateStmt->error);
                     }
                     $updateStmt->close();
                 } else {
                     // Insert new record
-                    $query = "INSERT INTO Opiskelijat (stat_code, stat_label, Vuosi, perusjalk, toisenjalk, korkeajalk, stat_update_date) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+                    $query = "INSERT INTO Opiskelijat (stat_code, stat_label, Vuosi, perusjalk, toisenjalk, korkeajalk, stat_latest, stat_update_date) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
                     $stmt = $conn->prepare($query);
                     if (!$stmt) {
                         throw new Exception("Error preparing SQL statement: " . $conn->error);
                     }
-                    $stmt->bind_param("sssddd", $alueId, $alueLabel, $vuosiId, $perusjalk, $toisenjalk, $korkeajalk);
+                    $stmt->bind_param("sssddds", $alueId, $alueLabel, $vuosiId, $perusjalk, $toisenjalk, $korkeajalk, $stat_latest);
                     if (!$stmt->execute()) {
                         throw new Exception("Error executing SQL statement: " . $stmt->error);
                     }
