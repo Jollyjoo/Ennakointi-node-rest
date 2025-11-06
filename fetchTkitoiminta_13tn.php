@@ -35,10 +35,29 @@ function fetchData($apiUrl, $postData) {
         ]
     ];
     $context  = stream_context_create($options);
+    
+    // Log the outgoing request for debugging
+    logMessage("Outgoing API JSON: " . json_encode($postData));
+    
     $result = file_get_contents($apiUrl, false, $context);
     if ($result === FALSE) {
+        // Get more detailed error information
+        $error = error_get_last();
+        if ($error) {
+            logMessage("API error_get_last: " . print_r($error, true));
+        }
+        
+        // Try to get HTTP response headers
+        if (isset($http_response_header)) {
+            logMessage("HTTP response headers: " . print_r($http_response_header, true));
+        }
+        
         throw new Exception("Virhe datan haussa API:sta");
     }
+    
+    // Log successful response (first 500 chars for debugging)
+    logMessage("API response received (first 500 chars): " . substr($result, 0, 500));
+    
     return json_decode($result, true);
 }
 
@@ -53,10 +72,21 @@ function main() {
     try {
         // Read JSON file and extract the actual query from queryObj
         $jsonArray = json_decode(file_get_contents($jsonFile), true);
+        if (!$jsonArray) {
+            throw new Exception("Failed to parse JSON file: " . $jsonFile);
+        }
+        
+        logMessage("JSON file loaded successfully");
+        
         $queryData = $jsonArray['queryObj']; // Extract the actual query structure
+        if (!$queryData) {
+            throw new Exception("queryObj not found in JSON file");
+        }
         
         // Päivitä Vuosi-arvot viimeisimmille 5 vuodelle
         $recentYears = getRecentYears(5);
+        logMessage("Using years: " . implode(", ", $recentYears));
+        
         foreach ($queryData['query'] as &$query) {
             if ($query['code'] === 'Vuosi') {
                 $query['selection']['values'] = $recentYears;
