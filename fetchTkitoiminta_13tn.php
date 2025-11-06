@@ -16,11 +16,11 @@ require_once __DIR__ . '/db.php';
 $apiUrl = 'https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tkke/statfin_tkke_pxt_13tn.px';
 $jsonFile = '_tkitoiminta_13tn.json';
 
-function getRecentYears($n = 3) {
+function getRecentYears($n = 4) {
     $years = [];
     $currentYear = (int)date('Y');
-    // Start from 2 years ago since T&K data is often delayed
-    for ($i = $n + 1; $i >= 2; $i--) {
+    // Start from 1 year ago since 2024 data is now available
+    for ($i = $n; $i >= 1; $i--) {
         $years[] = (string)($currentYear - $i);
     }
     return $years;
@@ -84,8 +84,8 @@ function main() {
             throw new Exception("queryObj not found in JSON file");
         }
         
-        // Päivitä Vuosi-arvot viimeisimmille 3 vuodelle (excluding most recent years)
-        $recentYears = getRecentYears(3);
+        // Päivitä Vuosi-arvot viimeisimmille 4 vuodelle (including 2024)
+        $recentYears = getRecentYears(4);
         logMessage("Using years: " . implode(", ", $recentYears));
         
         // Try to fetch data, if API returns error, drop the most recent year and try again
