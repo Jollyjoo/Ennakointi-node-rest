@@ -16,10 +16,11 @@ require_once __DIR__ . '/db.php';
 $apiUrl = 'https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tkke/statfin_tkke_pxt_13tn.px';
 $jsonFile = '_tkitoiminta_13tn.json';
 
-function getRecentYears($n = 5) {
+function getRecentYears($n = 3) {
     $years = [];
     $currentYear = (int)date('Y');
-    for ($i = $n - 1; $i >= 0; $i--) {
+    // Start from 2 years ago since T&K data is often delayed
+    for ($i = $n + 1; $i >= 2; $i--) {
         $years[] = (string)($currentYear - $i);
     }
     return $years;
@@ -83,18 +84,38 @@ function main() {
             throw new Exception("queryObj not found in JSON file");
         }
         
-        // Päivitä Vuosi-arvot viimeisimmille 5 vuodelle
-        $recentYears = getRecentYears(5);
+        // Päivitä Vuosi-arvot viimeisimmille 3 vuodelle (excluding most recent years)
+        $recentYears = getRecentYears(3);
         logMessage("Using years: " . implode(", ", $recentYears));
         
-        foreach ($queryData['query'] as &$query) {
-            if ($query['code'] === 'Vuosi') {
-                $query['selection']['values'] = $recentYears;
+        // Try to fetch data, if API returns error, drop the most recent year and try again
+        $maxTries = count($recentYears);
+        $success = false;
+        for ($try = $maxTries; $try >= 1; $try--) {
+            $yearsToTry = array_slice($recentYears, 0, $try); // Drop most recent years if they fail
+            logMessage("Trying years: " . implode(",", $yearsToTry));
+            
+            foreach ($queryData['query'] as &$query) {
+                if ($query['code'] === 'Vuosi') {
+                    $query['selection']['values'] = $yearsToTry;
+                }
+            }
+            unset($query);
+            
+            try {
+                $data = fetchData($apiUrl, $queryData);
+                logMessage("API success for years: " . implode(",", $yearsToTry));
+                $success = true;
+                break; // Success, break out of the loop
+            } catch (Exception $apiEx) {
+                logMessage("API error for years: " . implode(",", $yearsToTry) . " - " . $apiEx->getMessage());
+                // Try again with one less year (from the newest)
             }
         }
-        unset($query);
         
-        $data = fetchData($apiUrl, $queryData);
+        if (!$success) {
+            throw new Exception("API failed for all attempted years: " . implode(",", $recentYears));
+        }
         
         // Get dataset-level updated timestamp and convert to MySQL DATETIME
         $last_data = isset($data['updated']) ? $data['updated'] : null;
