@@ -1,0 +1,45 @@
+{"queryObj":{
+  "query": [
+    {
+      "code": "Vuosi",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "2022",
+          "2023",
+          "2024"
+        ]
+      }
+    },
+    {
+      "code": "Alue",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS",
+          "MK01",
+          "MK05",
+          "MK06",
+          "MK07",
+          "MK08",
+          "MK09"
+        ]
+      }
+    },
+    {
+      "code": "Sektori",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "SSS",
+          "yri",
+          "julk_yvt",
+          "korkeak"
+        ]
+      }
+    }
+  ],
+  "response": {
+    "format": "json-stat2"
+  }
+},"tableIdForQuery":"statfin_tkke_pxt_13tn.px"}

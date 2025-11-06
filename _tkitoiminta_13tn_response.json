@@ -1,0 +1,257 @@
+{
+    "version": "2.0",
+    "class": "dataset",
+    "label": "Tutkimus- ja kehittämistoiminnan menot, henkilöstö ja työvuodet alueittain muuttujina Vuosi, Alue, Sektori ja Tiedot",
+    "source": "Tilastokeskus, tutkimus- ja kehittämistoiminta",
+    "updated": "2025-10-23T05:00:00Z",
+    "note": [
+        "<A HREF='https://stat.fi/tilasto/dokumentaatio/tkke' TARGET=_blank>Tilaston dokumentaatio</A>",
+        "... tieto on salassapitosäännön alainen\r\n- ei yhtään",
+        "Aluetiedot kerätään kuntatasolla, mutta julkaistaan maakuntatasolla https://tilastokeskus.fi/fi/luokitukset/\r\nJulkinen sektori: Valtion hallinnonalat, kunnat, muut julkiset laitokset sekä yksityinen voittoa tavoittelematon toiminta."
+    ],
+    "role": {
+        "time": [
+            "Vuosi"
+        ],
+        "geo": [
+            "Alue"
+        ],
+        "metric": [
+            "Tiedot"
+        ]
+    },
+    "id": [
+        "Vuosi",
+        "Alue",
+        "Sektori",
+        "Tiedot"
+    ],
+    "size": [
+        3,
+        2,
+        4,
+        3
+    ],
+    "dimension": {
+        "Vuosi": {
+            "label": "Vuosi",
+            "category": {
+                "index": {
+                    "2022": 0,
+                    "2023": 1,
+                    "2024": 2
+                },
+                "label": {
+                    "2022": "2022",
+                    "2023": "2023",
+                    "2024": "2024"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Vuosi": "SCALE-TYPE=None"
+                        }
+                    }
+                ]
+            }
+        },
+        "Alue": {
+            "label": "Alue",
+            "category": {
+                "index": {
+                    "MK05": 0,
+                    "MK07": 1
+                },
+                "label": {
+                    "MK05": "MK05 Kanta-Häme",
+                    "MK07": "MK07 Päijät-Häme"
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Alue": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Sektori": {
+            "label": "Sektori",
+            "category": {
+                "index": {
+                    "SSS": 0,
+                    "yri": 1,
+                    "julk_yvt": 2,
+                    "korkeak": 3
+                },
+                "label": {
+                    "SSS": "Yhteensä",
+                    "yri": "YRITYSSEKTORI YHTEENSÄ",
+                    "julk_yvt": "JULKINEN SEKTORI + YVT YHTEENSÄ",
+                    "korkeak": "KORKEAKOULUSEKTORI YHTEENSÄ"
+                }
+            },
+            "extension": {
+                "elimination": true,
+                "eliminationValueCode": "SSS",
+                "show": "value"
+            },
+            "link": {
+                "describedby": [
+                    {
+                        "extension": {
+                            "Sektori": "SCALE-TYPE=nominal"
+                        }
+                    }
+                ]
+            }
+        },
+        "Tiedot": {
+            "label": "Tiedot",
+            "category": {
+                "index": {
+                    "tk_menot": 0,
+                    "tk_hlomaara": 1,
+                    "tk_htv": 2
+                },
+                "label": {
+                    "tk_menot": "T&k-menot (milj.EUR)",
+                    "tk_hlomaara": "T&k-henkilöstö (lkm)",
+                    "tk_htv": "T&k-työvuodet (htv)"
+                },
+                "unit": {
+                    "tk_menot": {
+                        "base": "Miljoonaa euroa",
+                        "decimals": 1
+                    },
+                    "tk_hlomaara": {
+                        "base": "lkm",
+                        "decimals": 0
+                    },
+                    "tk_htv": {
+                        "base": "htv",
+                        "decimals": 1
+                    }
+                }
+            },
+            "extension": {
+                "elimination": false,
+                "show": "value"
+            }
+        }
+    },
+    "extension": {
+        "px": {
+            "tableid": "statfin_tkke_pxt_13tn",
+            "decimals": 0,
+            "official-statistics": true,
+            "aggregallowed": true,
+            "language": "fi",
+            "contents": "Tutkimus- ja kehittämistoiminnan menot, henkilöstö ja työvuodet alueittain",
+            "description": "13tn -- Tutkimus- ja kehittämistoiminnan menot, henkilöstö ja työvuodet alueittain, 2011-2024",
+            "descriptiondefault": false,
+            "heading": [
+                "Tiedot"
+            ],
+            "stub": [
+                "Vuosi",
+                "Alue",
+                "Sektori"
+            ],
+            "matrix": "001_13tn_2024",
+            "subject-code": "TKKE",
+            "subject-area": "tkke"
+        },
+        "contact": [
+            {
+                "raw": "<A HREF='https://stat.fi/tilasto/tkke' TARGET=_blank>Tilaston kotisivu</A>"
+            }
+        ]
+    },
+    "value": [
+        73.8,
+        893,
+        531.1,
+        33.8,
+        354,
+        189.5,
+        26.4,
+        290,
+        195.8,
+        13.6,
+        249,
+        145.8,
+        94.5,
+        1228,
+        848.7,
+        63.3,
+        760,
+        582.4,
+        2.1,
+        67,
+        43.8,
+        29.1,
+        402,
+        222.5,
+        74.3,
+        975,
+        586.6,
+        32,
+        383,
+        201.1,
+        27.2,
+        281,
+        196.3,
+        15.2,
+        311,
+        189.1,
+        96.9,
+        1281,
+        856.7,
+        61.7,
+        739,
+        533.1,
+        3,
+        86,
+        61.2,
+        32.2,
+        456,
+        262.4,
+        74,
+        1026,
+        547.8,
+        31.2,
+        407,
+        187.5,
+        25.7,
+        288,
+        183.7,
+        17.1,
+        331,
+        176.6,
+        116.6,
+        1286,
+        902.4,
+        77.8,
+        739,
+        562.9,
+        2.1,
+        49,
+        43.1,
+        36.8,
+        499,
+        296.4
+    ]
+}
