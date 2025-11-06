@@ -19,9 +19,9 @@ $jsonFile = '_tkitoiminta_13tn.json';
 function getRecentYears($n = 4) {
     $years = [];
     $currentYear = (int)date('Y');
-    // Start from 1 year ago since 2024 data is now available
-    for ($i = $n; $i >= 1; $i--) {
-        $years[] = (string)($currentYear - $i);
+    // Start from 2011 and go up to current year
+    for ($year = 2011; $year <= $currentYear; $year++) {
+        $years[] = (string)$year;
     }
     return $years;
 }
