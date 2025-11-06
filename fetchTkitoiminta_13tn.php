@@ -186,11 +186,25 @@ function main() {
                         continue;
                     }
                     
+                    // Check if record exists for this stat_code, vuosi, sektori
+                    $checkQuery = "SELECT COUNT(*) FROM Tki WHERE stat_code = ? AND vuosi = ? AND sektori = ?";
+                    $checkStmt = $pdo->prepare($checkQuery);
+                    $checkStmt->execute([$stat_code, $vuosi, $sektori]);
+                    $count = $checkStmt->fetchColumn();
+                    
                     $now = date('Y-m-d H:i:s');
-                    $insertQuery = "INSERT INTO Tki (stat_code, vuosi, sektori, tkmenot, tkhenkilosto, tktyovuodet, last_data, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n" .
-                        "ON DUPLICATE KEY UPDATE tkmenot=VALUES(tkmenot), tkhenkilosto=VALUES(tkhenkilosto), tktyovuodet=VALUES(tktyovuodet), last_data=VALUES(last_data), timestamp=VALUES(timestamp)";
-                    $insertStmt = $pdo->prepare($insertQuery);
-                    $insertStmt->execute([$stat_code, $vuosi, $sektori, $tkmenot, $tkhenkilosto, $tktyovuodet, $last_data, $now]);
+                    
+                    if ($count > 0) {
+                        // Update existing record
+                        $updateQuery = "UPDATE Tki SET tkmenot=?, tkhenkilosto=?, tktyovuodet=?, last_data=?, timestamp=? WHERE stat_code=? AND vuosi=? AND sektori=?";
+                        $updateStmt = $pdo->prepare($updateQuery);
+                        $updateStmt->execute([$tkmenot, $tkhenkilosto, $tktyovuodet, $last_data, $now, $stat_code, $vuosi, $sektori]);
+                    } else {
+                        // Insert new record
+                        $insertQuery = "INSERT INTO Tki (stat_code, vuosi, sektori, tkmenot, tkhenkilosto, tktyovuodet, last_data, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                        $insertStmt = $pdo->prepare($insertQuery);
+                        $insertStmt->execute([$stat_code, $vuosi, $sektori, $tkmenot, $tkhenkilosto, $tktyovuodet, $last_data, $now]);
+                    }
                 }
             }
         }
