@@ -162,6 +162,7 @@ function main() {
             throw new Exception("UTF8MB4 charsetin asetus epäonnistui: " . $conn->error);
         }
 
+        
         // value-taulukko on järjestyksessä: for each alue, for each toimiala, for each kuukausi, for each tiedot
         $alueCount = count($alueKeys);
         $toimialaCount = count($toimialaKeys);
