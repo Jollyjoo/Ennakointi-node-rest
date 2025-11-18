@@ -2,6 +2,7 @@
 // Tämä ohjelma hakee Tilastokeskuksen API:sta T&K-toiminnan tiedot ja tallentaa ne MySQL-tietokantaan.
 // Ohjelma lukee JSON-tiedoston, lähettää POST-pyynnön Tilastokeskuksen API:in, parsii vastauksen ja tallentaa tiedot tietokantaan.
 // Tietokantataulu rakenne:
+// Taulu: Tki
 //   1 stat_code varchar(11)
 //   2 vuosi int(5)
 //   3 timestamp timestamp
