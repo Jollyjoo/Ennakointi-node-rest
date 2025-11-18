@@ -24,8 +24,6 @@ Tietokantataulu Alueentyopaikat rakenne:
 
 
 
-
-
 // MySQL-tietokannan asetukset
 $servername = "tulevaisuusluotain.fi";
 $username = "catbxjbt_Christian";
