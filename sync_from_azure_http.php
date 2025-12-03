@@ -12,13 +12,16 @@ try {
     // MySQL connection (this should work since you have MySQL driver)
     $mysql_pdo = new PDO($dsn, $db_user, $db_pass, [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"]);
     
-    // Call your Azure App Service API (add API key as URL parameter)
-    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api_simple.php?api_key=your-secret-api-key';
+    // Call your Azure App Service API (use azure_api.php with POST for API key)
+    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php';
     
-    // Get queue data via GET (we know this works from curl test)
+    // Send API key via POST data (since URL parameters don't work)
+    $post_data = http_build_query(['api_key' => 'your-secret-api-key']);
     $context = stream_context_create([
         'http' => [
-            'method' => 'GET',
+            'method' => 'POST',
+            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+            'content' => $post_data,
             'timeout' => 30
         ]
     ]);
