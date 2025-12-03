@@ -23,6 +23,7 @@ try {
         ]
     ]);
     
+    
     $response = file_get_contents($azure_api_url, false, $context);
     
     if ($response === false) {
