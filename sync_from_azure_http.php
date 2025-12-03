@@ -12,8 +12,8 @@ try {
     // MySQL connection (this should work since you have MySQL driver)
     $mysql_pdo = new PDO($dsn, $db_user, $db_pass, [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"]);
     
-    // Call your Azure App Service API (use GET since POST fails with azure_api_simple)
-    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api_simple.php';
+    // Call your Azure App Service API (add API key as URL parameter)
+    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api_simple.php?api_key=your-secret-api-key';
     
     // Get queue data via GET (we know this works from curl test)
     $context = stream_context_create([
@@ -31,16 +31,12 @@ try {
     
     $data = json_decode($response, true);
     
-    // Check if we got the "API key required" error and handle it
-    if ($data && $data['status'] === 'error' && strpos($data['message'], 'API key required') !== false) {
-        // For testing, let's see what we actually get and continue with empty records
-        error_log("[" . date('Y-m-d H:i:s') . "] API returned: " . $response);
-        $queue_records = []; // No records to process
-    } elseif ($data && $data['status'] !== 'success') {
+    // Now we should get success with queue records
+    if ($data && $data['status'] !== 'success') {
         throw new Exception("Azure API error: " . $data['message']);
-    } else {
-        $queue_records = $data['records'] ?? [];
     }
+    
+    $queue_records = $data['records'] ?? [];
     
     if (count($queue_records) > 0) {
         // Prepare MySQL insert - matches your actual table structure
