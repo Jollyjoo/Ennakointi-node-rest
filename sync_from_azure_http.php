@@ -12,13 +12,16 @@ try {
     // MySQL connection (this should work since you have MySQL driver)
     $mysql_pdo = new PDO($dsn, $db_user, $db_pass, [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"]);
     
-    // Call your Azure App Service API (using URL parameter for better compatibility)
-    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php?api_key=your-secret-api-key';
+    // Call your Azure App Service API (using POST to avoid URL parameter issues)
+    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php';
     
-    // Get queue data via HTTP
+    // Get queue data via HTTP POST
+    $post_data = http_build_query(['api_key' => 'your-secret-api-key']);
     $context = stream_context_create([
         'http' => [
-            'method' => 'GET',
+            'method' => 'POST',
+            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+            'content' => $post_data,
             'timeout' => 30
         ]
     ]);
@@ -38,12 +41,12 @@ try {
     $queue_records = $data['records'];
     
     if (count($queue_records) > 0) {
-        // Prepare MySQL insert
+        // Prepare MySQL insert - matches your actual table structure
         $mysql_insert = "INSERT INTO Mediaseuranta (
-            azure_sync_id, Maakunta_ID, Teema, uutisen_pvm, Uutinen, Url, Hankkeen_luokitus,
+            Maakunta_ID, Teema, uutisen_pvm, Uutinen, Url, Hankkeen_luokitus,
             ai_analysis_status, ai_relevance_score, ai_economic_impact,
             ai_employment_impact, ai_key_sectors, ai_sentiment, ai_crisis_probability
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $mysql_stmt = $mysql_pdo->prepare($mysql_insert);
         
@@ -52,7 +55,6 @@ try {
         
         foreach ($queue_records as $record) {
             $result = $mysql_stmt->execute([
-                $record['MediaseurantaID'],
                 $record['Maakunta_ID'],
                 $record['Teema'],
                 $record['uutisen_pvm'],
@@ -74,10 +76,14 @@ try {
             }
         }
         
-        // Mark records as processed via HTTP
+        // Mark records as processed via HTTP POST
         if (count($processed_queue_ids) > 0) {
-            $mark_processed_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php?action=mark_processed&api_key=your-secret-api-key';
-            $post_data = http_build_query(['queue_ids' => implode(',', $processed_queue_ids)]);
+            $mark_processed_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php';
+            $post_data = http_build_query([
+                'api_key' => 'your-secret-api-key',
+                'action' => 'mark_processed',
+                'queue_ids' => implode(',', $processed_queue_ids)
+            ]);
             
             $context = stream_context_create([
                 'http' => [
