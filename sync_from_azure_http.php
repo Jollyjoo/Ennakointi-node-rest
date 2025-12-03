@@ -14,7 +14,7 @@ try {
     
     // Instead of connecting directly to Azure SQL, call a PHP endpoint on Azure
     // You'll need to create azure_api.php on Azure App Service (free tier)
-    $azure_api_url = 'https://your-azure-app.azurewebsites.net/azure_api.php';
+    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php';
     $api_key = 'your-secret-api-key';
     
     // Get queue data via HTTP

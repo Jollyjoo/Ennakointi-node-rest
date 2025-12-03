@@ -18,7 +18,6 @@ deployment:
     - /bin/cp _talous_11vs.json $DEPLOYPATH
     - /bin/cp fetchTkitoiminta_13tn.php $DEPLOYPATH
     - /bin/cp _tkitoiminta_13tn.json $DEPLOYPATH
-    - /bin/cp sync_from_azure_cron.php $DEPLOYPATH
     - /bin/cp sync_from_azure_http.php $DEPLOYPATH
 
     
