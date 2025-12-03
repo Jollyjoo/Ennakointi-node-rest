@@ -12,10 +12,10 @@ try {
     // MySQL connection (this should work since you have MySQL driver)
     $mysql_pdo = new PDO($dsn, $db_user, $db_pass, [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"]);
     
-    // Call your Azure App Service API (using POST to avoid URL parameter issues)
-    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php';
+    // Call your Azure App Service API (use the working azure_api_simple.php)
+    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api_simple.php';
     
-    // Get queue data via HTTP POST
+    // Get queue data via POST (azure_api_simple accepts both GET and POST)
     $post_data = http_build_query(['api_key' => 'your-secret-api-key']);
     $context = stream_context_create([
         'http' => [
@@ -76,20 +76,16 @@ try {
             }
         }
         
-        // Mark records as processed via HTTP POST
+        // Mark records as processed via markprocessed.php (which should work)
         if (count($processed_queue_ids) > 0) {
-            $mark_processed_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php';
-            $post_data = http_build_query([
-                'api_key' => 'your-secret-api-key',
-                'action' => 'mark_processed',
-                'queue_ids' => implode(',', $processed_queue_ids)
-            ]);
+            $queue_ids_string = implode(',', $processed_queue_ids);
+            $mark_processed_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/markprocessed.php';
             
             $context = stream_context_create([
                 'http' => [
                     'method' => 'POST',
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'content' => $post_data,
+                    'header' => "Content-Type: text/plain\r\n",
+                    'content' => $queue_ids_string,
                     'timeout' => 30
                 ]
             ]);
