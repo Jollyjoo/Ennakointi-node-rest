@@ -12,22 +12,12 @@ try {
     // MySQL connection (this should work since you have MySQL driver)
     $mysql_pdo = new PDO($dsn, $db_user, $db_pass, [PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"]);
     
-    // Call your Azure App Service API (use azure_api.php with POST for API key)
-    $azure_api_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/azure_api.php';
+    // Call Azure App Service API using the stable endpoint and action
+    $azure_base = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/api_stub.php';
+    $get_queue_url = $azure_base . '?action=get_queue&api_key=your-secret-api-key';
     
-    // Send API key via POST data (since URL parameters don't work)
-    $post_data = http_build_query(['api_key' => 'your-secret-api-key']);
-    $context = stream_context_create([
-        'http' => [
-            'method' => 'POST',
-            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-            'content' => $post_data,
-            'timeout' => 30
-        ]
-    ]);
-    
-    
-    $response = file_get_contents($azure_api_url, false, $context);
+    // Use GET for get_queue (proven reliable)
+    $response = file_get_contents($get_queue_url);
     
     if ($response === false) {
         throw new Exception("Failed to connect to Azure API");
@@ -36,7 +26,7 @@ try {
     $data = json_decode($response, true);
     
     // Now we should get success with queue records
-    if ($data && $data['status'] !== 'success') {
+    if ($data && ($data['status'] ?? '') !== 'success') {
         throw new Exception("Azure API error: " . $data['message']);
     }
     
@@ -78,21 +68,15 @@ try {
             }
         }
         
-        // Mark records as processed via markprocessed.php (which should work)
+        // Mark records as processed via api_stub.php GET
         if (count($processed_queue_ids) > 0) {
             $queue_ids_string = implode(',', $processed_queue_ids);
-            $mark_processed_url = 'https://tulevaisuus-fja2fhh4dsesakhj.westeurope-01.azurewebsites.net/markprocessed.php';
-            
-            $context = stream_context_create([
-                'http' => [
-                    'method' => 'POST',
-                    'header' => "Content-Type: text/plain\r\n",
-                    'content' => $queue_ids_string,
-                    'timeout' => 30
-                ]
-            ]);
-            
-            file_get_contents($mark_processed_url, false, $context);
+            $mark_processed_url = $azure_base . '?action=mark_processed&queue_ids=' . urlencode($queue_ids_string) . '&api_key=your-secret-api-key';
+            $mp_response = file_get_contents($mark_processed_url);
+            $mp = json_decode($mp_response, true);
+            if (!$mp || ($mp['status'] ?? '') !== 'success') {
+                error_log("[" . date('Y-m-d H:i:s') . "] Mark processed call returned: " . ($mp_response ?: 'no response'));
+            }
         }
         
         error_log("[" . date('Y-m-d H:i:s') . "] Processed $synced_count queue records via HTTP API");
