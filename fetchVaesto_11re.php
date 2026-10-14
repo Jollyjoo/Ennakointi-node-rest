@@ -41,6 +41,7 @@ require_once __DIR__ . '/db.php';
 // Tilastokeskuksen API:n osoite
 $apiUrl = 'https://statfin.stat.fi:443/PxWeb/api/v1/fi/StatFin/vaerak/statfin_vaerak_pxt_11re.px';
 $jsonFile = '_vaesto_11re.json';
+require_once __DIR__ . '/px_helpers.php';
 
 // Funktio JSON-tiedoston lukemiseen
 function getData($jsonFile) {

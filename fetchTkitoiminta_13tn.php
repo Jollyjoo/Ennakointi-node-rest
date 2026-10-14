@@ -16,6 +16,7 @@ require_once __DIR__ . '/db.php';
 
 $apiUrl = 'https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tkke/statfin_tkke_pxt_13tn.px';
 $jsonFile = '_tkitoiminta_13tn.json';
+require_once __DIR__ . '/px_helpers.php';
 
 function getRecentYears($n = 4) {
     $years = [];

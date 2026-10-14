@@ -36,6 +36,7 @@ require_once __DIR__ . '/db.php';
 // Tilastokeskuksen API:n osoite
 $apiUrl = 'https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/opiskt/statfin_opiskt_pxt_11c4.px';
 $jsonFile = '_vieraskiel_11c4.json';
+require_once __DIR__ . '/px_helpers.php';
 
 // Funktio JSON-tiedoston lukemiseen
 function getData($jsonFile) {

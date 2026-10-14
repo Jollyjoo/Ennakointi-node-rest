@@ -19,6 +19,7 @@ $dbname = "catbxjbt_ennakointi";
 // Tilastokeskuksen API endpoint tilastolle
 $apiUrl = 'https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/vkour/statfin_vkour_pxt_12bs.px';
 $jsonFile = '_valmistuneet_12bs.json';
+require_once __DIR__ . '/px_helpers.php';
 
 // Function to read the JSON file
 function getData($jsonFile) {

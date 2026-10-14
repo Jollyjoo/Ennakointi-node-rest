@@ -18,6 +18,7 @@ $dbname = "catbxjbt_ennakointi";
 // Tilastokeskuksen API:n osoite
 $apiUrl = 'https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyonv/statfin_tyonv_pxt_12r5.px';
 $jsonFile = '_tyottomat_12r5.json';
+require_once __DIR__ . '/px_helpers.php';
 
 // Funktio JSON-tiedoston lukemiseen
 function getData($jsonFile) {

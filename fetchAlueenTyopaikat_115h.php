@@ -33,6 +33,7 @@ $dbname = "catbxjbt_ennakointi";
 // Tilastokeskuksen API:n osoite
 $apiUrl = 'https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyokay/statfin_tyokay_pxt_115h.px';
 $jsonFile = '_alueentyopaikat_115h.json';
+require_once __DIR__ . '/px_helpers.php';
 
 // Funktio JSON-tiedoston lukemiseen
 function getData($jsonFile) {

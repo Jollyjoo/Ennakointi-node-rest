@@ -44,6 +44,7 @@ $dbname = "catbxjbt_ennakointi";
 // Tilastokeskuksen API:n osoite
 $apiUrl = 'https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyonv/12tw.px';
 $jsonFile = '_avoimetpaikat12tw.json';
+require_once __DIR__ . '/px_helpers.php';
 
 // Funktio JSON-tiedoston lukemiseen
 function getData($jsonFile) {
