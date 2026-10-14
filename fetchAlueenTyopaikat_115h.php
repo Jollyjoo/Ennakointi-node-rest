@@ -109,10 +109,11 @@ function main() {
         $newStatData = $jsonArray;
 
         // Yritetään hakea data viimeisimmistä vuosista.
+        // Jos API hylkää uusimman vuoden, pudotetaan se pois ja yritetään uudelleen vanhemmilla vuosilla.
         $maxTries = count($recentVuodet);
         $success = false;
-        for ($try = $maxTries; $try >= 1; $try--) {
-            $yearsToTry = array_slice($recentVuodet, 0, $try);
+        for ($try = 0; $try < $maxTries; $try++) {
+            $yearsToTry = array_slice($recentVuodet, $try);
             foreach ($jsonArray['query'] as &$query) {
                 if (isset($query['code']) && in_array($query['code'], $yearCandidates, true)) {
                     $query['selection']['values'] = $yearsToTry;
