@@ -39,7 +39,7 @@
       }
     },
     {
-      "code": "Kuukausi",
+      "code": "timeperiod_m",
       "selection": {
         "filter": "item",
         "values": [
@@ -49,7 +49,7 @@
       }
     },
     {
-      "code": "Tiedot",
+      "code": "contentscode",
       "selection": {
         "filter": "item",
         "values": [
