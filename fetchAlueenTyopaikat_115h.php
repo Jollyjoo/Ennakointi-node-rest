@@ -136,11 +136,19 @@ function main() {
 
     // Parsitaan data dynaamisesti ja kirjoitetaan diagnostinen informaatio lokiin
     dump_dimensions_for_debug($data);
-    $alueKey = find_dimension_key($data, ['Työpaikan alue', 'Alue', 'alue', 'alue_23_20260101']) ?? (isset($data['dimension']['Työpaikan alue']) ? 'Työpaikan alue' : null);
-    $toimialaKey = find_dimension_key($data, ['Toimiala', 'toimiala']) ?? (isset($data['dimension']['Toimiala']) ? 'Toimiala' : null);
-    $sukupuoliKey = find_dimension_key($data, ['Sukupuoli', 'sukupuoli']) ?? (isset($data['dimension']['Sukupuoli']) ? 'Sukupuoli' : null);
-    $vuosiKey = find_dimension_key($data, ['Vuosi', 'timeperiod_y', 'Year']) ?? (isset($data['dimension']['Vuosi']) ? 'Vuosi' : null);
-    $tiedotKey = find_dimension_key($data, ['Tiedot', 'contentscode', 'Information']) ?? (isset($data['dimension']['Tiedot']) ? 'Tiedot' : null);
+    // 115h:n dimensioiden avaimet ovat StatFinin metadata-koodit, eivät vanhoja nimiä.
+    // Käytetään niitä tarkasti, ja vain jos ne puuttuvat, tehdään fallback vanhojen nimien kautta.
+    $dimensions = $data['dimension'] ?? [];
+    $alueKey = isset($dimensions['alue_23_20260101']) ? 'alue_23_20260101'
+        : (isset($dimensions['alue_23_20230101']) ? 'alue_23_20230101' : (find_dimension_key($data, ['Työpaikan alue', 'Alue', 'alue']) ?? (isset($dimensions['Työpaikan alue']) ? 'Työpaikan alue' : null)));
+    $toimialaKey = isset($dimensions['toimiala_108_20230101']) ? 'toimiala_108_20230101'
+        : (find_dimension_key($data, ['Toimiala', 'toimiala']) ?? (isset($dimensions['Toimiala']) ? 'Toimiala' : null));
+    $sukupuoliKey = isset($dimensions['sukupuoli_9_20180101']) ? 'sukupuoli_9_20180101'
+        : (find_dimension_key($data, ['Sukupuoli', 'sukupuoli']) ?? (isset($dimensions['Sukupuoli']) ? 'Sukupuoli' : null));
+    $vuosiKey = isset($dimensions['timeperiod_y']) ? 'timeperiod_y'
+        : (find_dimension_key($data, ['Vuosi', 'Year']) ?? (isset($dimensions['Vuosi']) ? 'Vuosi' : null));
+    $tiedotKey = isset($dimensions['contentscode']) ? 'contentscode'
+        : (find_dimension_key($data, ['Tiedot', 'Information']) ?? (isset($dimensions['Tiedot']) ? 'Tiedot' : null));
     if (!$alueKey || !$toimialaKey || !$sukupuoliKey || !$vuosiKey || !$tiedotKey) {
         throw new Exception("Ei löytynyt odotettuja dimensioita: alue={$alueKey}, toimiala={$toimialaKey}, sukupuoli={$sukupuoliKey}, vuosi={$vuosiKey}, tiedot={$tiedotKey}");
     }
