@@ -107,6 +107,29 @@ function dump_dimensions_for_debug($data) {
     logMessage("Dimensions: " . implode(' | ', $out));
 }
 
+// Apufunktio: sitoo parametrilistan dynaamisesti tyyppien mukaan (NULL tukena)
+function bind_stmt_params($stmt, $params) {
+    $types = '';
+    $refs = [];
+    foreach ($params as $i => $p) {
+        if (is_null($p)) {
+            $types .= 's';
+            $refs[] = & $params[$i];
+        } elseif (is_int($p)) {
+            $types .= 'i';
+            $refs[] = & $params[$i];
+        } elseif (is_float($p) || is_double($p)) {
+            $types .= 'd';
+            $refs[] = & $params[$i];
+        } else {
+            $types .= 's';
+            $refs[] = & $params[$i];
+        }
+    }
+    array_unshift($refs, $types);
+    return call_user_func_array([$stmt, 'bind_param'], $refs);
+}
+
 // Funktio lokiviestien kirjoittamiseen tiedostoon
 function logMessage($message) {
     $logFile = 'fetch-data.log';
@@ -269,8 +292,8 @@ function main() {
                     if (!$updateStmt) {
                         throw new Exception("Virhe SQL-päivityslauseen valmistelussa: " . $conn->error);
                     }
-                    $updateStmt->bind_param("issssssssssss", $maakunta_ID, $alueLabel, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp, $palvelut_yht, $alueId, $aika);
-                    if (!$updateStmt->execute()) {
+                    $bindOk = bind_stmt_params($updateStmt, [$maakunta_ID, $alueLabel, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp, $palvelut_yht, $alueId, $aika]);
+                    if (!$bindOk || !$updateStmt->execute()) {
                         throw new Exception("Virhe SQL-päivityslauseen suorittamisessa: " . $updateStmt->error);
                     }
                     $updateStmt->close();
@@ -281,8 +304,8 @@ function main() {
                     if (!$stmt) {
                         throw new Exception("Virhe SQL-lauseen valmistelussa: " . $conn->error);
                     }
-                    $stmt->bind_param("issssssssssss", $maakunta_ID, $alueId, $alueLabel, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp, $palvelut_yht);
-                    if (!$stmt->execute()) {
+                    $bindOk = bind_stmt_params($stmt, [$maakunta_ID, $alueId, $alueLabel, $aika, $tyottomatlopussa, $tyotosuus, $tyottomat20, $tyottomat25, $tyottomat50, $tyottomatulk, $pitkaaikaistyottomat, $uudetavp, $palvelut_yht]);
+                    if (!$bindOk || !$stmt->execute()) {
                         throw new Exception("Virhe SQL-lauseen suorittamisessa: " . $stmt->error);
                     }
                     $stmt->close();

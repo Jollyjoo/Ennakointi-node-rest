@@ -42,7 +42,7 @@ $password = "Juustonaksu5";
 $dbname = "catbxjbt_ennakointi";
 
 // Tilastokeskuksen API:n osoite
-$apiUrl = 'https://statfin.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyonv/statfin_tyonv_pxt_12tw.px';
+$apiUrl = 'https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyonv/12tw.px';
 $jsonFile = '_avoimetpaikat12tw.json';
 
 // Funktio JSON-tiedoston lukemiseen
@@ -80,6 +80,74 @@ function fetchData($apiUrl, $postData) {
     return json_decode($result, true);
 }
 
+// Apufunktiot (samat kuin muissa skripteissä)
+function find_dimension_key($data, $candidates = []) {
+    if (!isset($data['dimension']) || !is_array($data['dimension'])) return null;
+    foreach ($data['dimension'] as $key => $dim) {
+        if (in_array($key, $candidates, true)) return $key;
+        if (isset($dim['id']) && in_array($dim['id'], $candidates, true)) return $key;
+        if (isset($dim['variableCode']) && in_array($dim['variableCode'], $candidates, true)) return $key;
+        if (isset($dim['category']['label']) && is_array($dim['category']['label'])) {
+            foreach ($dim['category']['label'] as $lbl) {
+                if (in_array($lbl, $candidates, true)) return $key;
+            }
+        }
+    }
+    return null;
+}
+
+function resolve_code_index($tiedot_map, $code) {
+    if (!$tiedot_map || !is_array($tiedot_map)) return null;
+    if (isset($tiedot_map[$code])) return $tiedot_map[$code];
+    foreach ($tiedot_map as $k => $v) {
+        if (stripos($k, $code) !== false) return $v;
+        if (preg_match('/' . preg_quote($code, '/') . '$/i', $k)) return $v;
+    }
+    return null;
+}
+
+function cast_numeric_or_null($val) {
+    if ($val === null) return null;
+    if (is_numeric($val)) return $val + 0;
+    return null;
+}
+
+function dump_dimensions_for_debug($data) {
+    if (!isset($data['dimension']) || !is_array($data['dimension'])) return;
+    $out = [];
+    foreach ($data['dimension'] as $k => $dim) {
+        $labels = '';
+        if (isset($dim['category']['label']) && is_array($dim['category']['label'])) {
+            $labels = implode(',', array_slice($dim['category']['label'], 0, 5));
+        }
+        $out[] = "$k: labels={$labels}";
+    }
+    logMessage("Dimensions: " . implode(' | ', $out));
+}
+
+// Dynaaminen bind helper: asettaa tyypit automaattisesti ja tukee NULL-arvoja
+function bind_stmt_params($stmt, $params) {
+    $types = '';
+    $refs = [];
+    foreach ($params as $i => $p) {
+        if (is_null($p)) {
+            $types .= 's';
+            $refs[] = & $params[$i];
+        } elseif (is_int($p)) {
+            $types .= 'i';
+            $refs[] = & $params[$i];
+        } elseif (is_float($p) || is_double($p)) {
+            $types .= 'd';
+            $refs[] = & $params[$i];
+        } else {
+            $types .= 's';
+            $refs[] = & $params[$i];
+        }
+    }
+    array_unshift($refs, $types);
+    return call_user_func_array([$stmt, 'bind_param'], $refs);
+}
+
 // Funktio lokiviestien kirjoittamiseen tiedostoon
 function logMessage($message) {
     $logFile = 'fetch-data.log';
@@ -112,11 +180,12 @@ function main() {
         // Yritetään hakea data, jos API palauttaa virheen, pudotetaan uusin kuukausi ja yritetään uudelleen
         $maxTries = count($recentKuukaudet);
         $success = false;
+        $monthCandidates = ['Kuukausi', 'timeperiod_m', 'Month'];
         for ($try = $maxTries; $try >= 1; $try--) {
             $monthsToTry = array_slice($recentKuukaudet, 0, $try); // Pudotetaan uusin kuukausi pois joka yrityksellä
             logMessage("Yritetään hakea kuukausille: " . implode(",", $monthsToTry));
             foreach ($jsonArray['query'] as &$query) {
-                if ($query['code'] === 'Kuukausi') {
+                if (isset($query['code']) && in_array($query['code'], $monthCandidates, true)) {
                     $query['selection']['values'] = $monthsToTry;
                 }
             }
@@ -137,15 +206,23 @@ function main() {
             throw new Exception("API epäonnistui kaikille viimeisimmille kuukausille");
         }
 
-        // Parsitaan data
-        $alueIndex = $data['dimension']['Alue']['category']['index'];
-        $alueLabels = $data['dimension']['Alue']['category']['label'];
-        $toimialaIndex = $data['dimension']['Toimiala']['category']['index'];
-        $toimialaLabels = $data['dimension']['Toimiala']['category']['label'];
-        $kuukausiIndex = $data['dimension']['Kuukausi']['category']['index'];
-        $kuukausiLabels = $data['dimension']['Kuukausi']['category']['label'];
-        $tiedotIndex = $data['dimension']['Tiedot']['category']['index'];
-        $tiedotLabels = $data['dimension']['Tiedot']['category']['label'];
+        // Parsitaan data dynaamisesti (tukee VARIABLECODE-muutoksia)
+        dump_dimensions_for_debug($data);
+        $alueKey = find_dimension_key($data, ['Alue', 'alue', 'Region']) ?? (isset($data['dimension']['Alue']) ? 'Alue' : null);
+        $toimialaKey = find_dimension_key($data, ['Toimiala', 'toimiala', 'industry']) ?? (isset($data['dimension']['Toimiala']) ? 'Toimiala' : null);
+        $kuukausiKey = find_dimension_key($data, ['Kuukausi', 'timeperiod_m', 'Month']) ?? (isset($data['dimension']['Kuukausi']) ? 'Kuukausi' : null);
+        $tiedotKey = find_dimension_key($data, ['Tiedot', 'contentscode', 'Information']) ?? (isset($data['dimension']['Tiedot']) ? 'Tiedot' : null);
+        if (!$alueKey || !$toimialaKey || !$kuukausiKey || !$tiedotKey) {
+            throw new Exception("Ei löytynyt odotettuja dimensioita: alue={$alueKey}, toimiala={$toimialaKey}, kuukausi={$kuukausiKey}, tiedot={$tiedotKey}");
+        }
+        $alueIndex = $data['dimension'][$alueKey]['category']['index'];
+        $alueLabels = $data['dimension'][$alueKey]['category']['label'];
+        $toimialaIndex = $data['dimension'][$toimialaKey]['category']['index'];
+        $toimialaLabels = $data['dimension'][$toimialaKey]['category']['label'];
+        $kuukausiIndex = $data['dimension'][$kuukausiKey]['category']['index'];
+        $kuukausiLabels = $data['dimension'][$kuukausiKey]['category']['label'];
+        $tiedotIndex = $data['dimension'][$tiedotKey]['category']['index'];
+        $tiedotLabels = $data['dimension'][$tiedotKey]['category']['label'];
 
         $alueKeys = array_keys($alueIndex);
         $toimialaKeys = array_keys($toimialaIndex);
@@ -207,12 +284,18 @@ function main() {
                     $checkStmt->close();
 
                     // Offset-laskenta ja maara haetaan ennen if-haaraa
-                    $tiedotIdx = 0; // Jos halutaan muuta, muuta tähän
-                    $offset = $i * $toimialaCount * $kuukausiCount * $tiedotCount
+                        // ratkaistaan tiedot-index dynaamisesti (esim. AVPAIKATLOPUSSA)
+                        $tiedot_map = $tiedotIndex;
+                        $tiedotIdx = resolve_code_index($tiedot_map, 'AVPAIKATLOPUSSA');
+                        if ($tiedotIdx === null) {
+                        // fallback: käytä ensimmäistä tiedot-arvoa
+                        $tiedotIdx = 0;
+                        }
+                        $offset = $i * $toimialaCount * $kuukausiCount * $tiedotCount
                             + $j * $kuukausiCount * $tiedotCount
                             + $k * $tiedotCount
                             + $tiedotIdx;
-                    $maara = isset($data['value'][$offset]) ? $data['value'][$offset] : null;
+                        $maara = isset($data['value'][$offset]) ? cast_numeric_or_null($data['value'][$offset]) : null;
                     if ($count > 0) {
                         // Päivitetään olemassa oleva tietue
                         $updateQuery = "UPDATE Avoimet_tyopaikat SET Maakunta_ID=?, Maara=?, stat_label=?, Aika=? WHERE stat_code=? AND Tilastokuukausi=? AND Toimiala=?";
@@ -220,8 +303,8 @@ function main() {
                         if (!$updateStmt) {
                             throw new Exception("Virhe SQL-päivityslauseen valmistelussa: " . $conn->error);
                         }
-                        $updateStmt->bind_param("iisssss", $maakuntaId, $maara, $alueLabel, $aika, $alueId, $tilastokuukausi, $toimialaLabel);
-                        if (!$updateStmt->execute()) {
+                        $bindOk = bind_stmt_params($updateStmt, [$maakuntaId, $maara, $alueLabel, $aika, $alueId, $tilastokuukausi, $toimialaLabel]);
+                        if (!$bindOk || !$updateStmt->execute()) {
                             throw new Exception("Virhe SQL-päivityslauseen suorittamisessa: " . $updateStmt->error);
                         }
                         $updateStmt->close();
@@ -232,8 +315,8 @@ function main() {
                         if (!$stmt) {
                             throw new Exception("Virhe SQL-lauseen valmistelussa: " . $conn->error);
                         }
-                        $stmt->bind_param("issssss", $maakuntaId, $tilastokuukausi, $maara, $toimialaLabel, $alueId, $alueLabel, $aika);
-                        if (!$stmt->execute()) {
+                        $bindOk = bind_stmt_params($stmt, [$maakuntaId, $tilastokuukausi, $maara, $toimialaLabel, $alueId, $alueLabel, $aika]);
+                        if (!$bindOk || !$stmt->execute()) {
                             throw new Exception("Virhe SQL-lauseen suorittamisessa: " . $stmt->error);
                         }
                         $stmt->close();
