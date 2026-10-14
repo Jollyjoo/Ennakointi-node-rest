@@ -96,4 +96,15 @@ if (!function_exists('getRecentKuukaudet')) {
     }
 }
 
+if (!function_exists('getRecentYears')) {
+    function getRecentYears($n = 5) {
+        $years = [];
+        $current = (int)date('Y');
+        for ($i = 1; $i <= $n; $i++) {
+            $years[] = (string)($current - ($n - $i));
+        }
+        return $years;
+    }
+}
+
 ?>

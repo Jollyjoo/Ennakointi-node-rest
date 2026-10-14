@@ -96,11 +96,17 @@ function main() {
         // Luetaan JSON-tiedosto taulukoksi
         $jsonArray = json_decode(file_get_contents($jsonFile), true);
 
-        // Päivitetään Kuukausi-arvot viimeisimmille 5 kuukaudelle
+        // Päivitä mahdollinen Kuukausi- tai Vuosi-kenttä dynaamisesti
         $recentKuukaudet = getRecentKuukaudet(5);
+        $recentVuodet = getRecentYears(5);
+        $monthCandidates = ['Kuukausi', 'timeperiod_m', 'Month'];
+        $yearCandidates = ['Vuosi', 'timeperiod_y', 'Year'];
         foreach ($jsonArray['query'] as &$query) {
-            if ($query['code'] === 'Kuukausi') {
+            if (isset($query['code']) && in_array($query['code'], $monthCandidates, true)) {
                 $query['selection']['values'] = $recentKuukaudet;
+            }
+            if (isset($query['code']) && in_array($query['code'], $yearCandidates, true)) {
+                $query['selection']['values'] = $recentVuodet;
             }
         }
         unset($query);
@@ -112,11 +118,15 @@ function main() {
         $maxTries = count($recentKuukaudet);
         $success = false;
         for ($try = $maxTries; $try >= 1; $try--) {
-            $monthsToTry = array_slice($recentKuukaudet, 0, $try); // Pudotetaan uusin kuukausi pois joka yrityksellä
-            //logMessage("Yritetään hakea kuukausille: " . implode(",", $monthsToTry));
+            // Try both months and years if present
+            $monthsToTry = array_slice($recentKuukaudet, 0, $try);
+            $yearsToTry = array_slice($recentVuodet, 0, $try);
             foreach ($jsonArray['query'] as &$query) {
-                if ($query['code'] === 'Kuukausi') {
+                if (isset($query['code']) && in_array($query['code'], $monthCandidates, true)) {
                     $query['selection']['values'] = $monthsToTry;
+                }
+                if (isset($query['code']) && in_array($query['code'], $yearCandidates, true)) {
+                    $query['selection']['values'] = $yearsToTry;
                 }
             }
             unset($query);
@@ -136,17 +146,26 @@ function main() {
             throw new Exception("API epäonnistui kaikille viimeisimmille kuukausille");
         }
 
-    // Parsitaan data
-    $alueIndex = $data['dimension']['Työpaikan alue']['category']['index'];
-    $alueLabels = $data['dimension']['Työpaikan alue']['category']['label'];
-    $toimialaIndex = $data['dimension']['Toimiala']['category']['index'];
-    $toimialaLabels = $data['dimension']['Toimiala']['category']['label'];
-    $sukupuoliIndex = $data['dimension']['Sukupuoli']['category']['index'];
-    $sukupuoliLabels = $data['dimension']['Sukupuoli']['category']['label'];
-    $vuosiIndex = $data['dimension']['Vuosi']['category']['index'];
-    $vuosiLabels = $data['dimension']['Vuosi']['category']['label'];
-    $tiedotIndex = $data['dimension']['Tiedot']['category']['index'];
-    $tiedotLabels = $data['dimension']['Tiedot']['category']['label'];
+    // Parsitaan data dynaamisesti ja kirjoitetaan diagnostinen informaatio lokiin
+    dump_dimensions_for_debug($data);
+    $alueKey = find_dimension_key($data, ['Työpaikan alue', 'Alue', 'alue', 'alue_23_20260101']) ?? (isset($data['dimension']['Työpaikan alue']) ? 'Työpaikan alue' : null);
+    $toimialaKey = find_dimension_key($data, ['Toimiala', 'toimiala']) ?? (isset($data['dimension']['Toimiala']) ? 'Toimiala' : null);
+    $sukupuoliKey = find_dimension_key($data, ['Sukupuoli', 'sukupuoli']) ?? (isset($data['dimension']['Sukupuoli']) ? 'Sukupuoli' : null);
+    $vuosiKey = find_dimension_key($data, ['Vuosi', 'timeperiod_y', 'Year']) ?? (isset($data['dimension']['Vuosi']) ? 'Vuosi' : null);
+    $tiedotKey = find_dimension_key($data, ['Tiedot', 'contentscode', 'Information']) ?? (isset($data['dimension']['Tiedot']) ? 'Tiedot' : null);
+    if (!$alueKey || !$toimialaKey || !$sukupuoliKey || !$vuosiKey || !$tiedotKey) {
+        throw new Exception("Ei löytynyt odotettuja dimensioita: alue={$alueKey}, toimiala={$toimialaKey}, sukupuoli={$sukupuoliKey}, vuosi={$vuosiKey}, tiedot={$tiedotKey}");
+    }
+    $alueIndex = $data['dimension'][$alueKey]['category']['index'];
+    $alueLabels = $data['dimension'][$alueKey]['category']['label'];
+    $toimialaIndex = $data['dimension'][$toimialaKey]['category']['index'];
+    $toimialaLabels = $data['dimension'][$toimialaKey]['category']['label'];
+    $sukupuoliIndex = $data['dimension'][$sukupuoliKey]['category']['index'];
+    $sukupuoliLabels = $data['dimension'][$sukupuoliKey]['category']['label'];
+    $vuosiIndex = $data['dimension'][$vuosiKey]['category']['index'];
+    $vuosiLabels = $data['dimension'][$vuosiKey]['category']['label'];
+    $tiedotIndex = $data['dimension'][$tiedotKey]['category']['index'];
+    $tiedotLabels = $data['dimension'][$tiedotKey]['category']['label'];
 
     $alueKeys = array_keys($alueIndex);
     $toimialaKeys = array_keys($toimialaIndex);
@@ -187,12 +206,26 @@ function main() {
                             $tiedotId = $tiedotKeys[$m];
                             $tiedotLabel = isset($tiedotLabels[$tiedotId]) ? $tiedotLabels[$tiedotId] : $tiedotId;
                             // Offset-laskenta: [Alue][Toimiala][Sukupuoli][Vuosi][Tiedot]
+                            // ratkaistaan tiedot-index dynaamisesti (esim. TYOPAIKATOL or similar)
+                            $tiedot_map = $tiedotIndex;
+                            $desired_tiedot_code = 'AVPAIKATLOPUSSA';
+                            // try common code names for tyopaikat
+                            $candidates = ['TYOPAIKAT', 'TYOPAIKATLOPUSSA', 'AVPAIKATLOPUSSA', 'Tyopaikat', 'TYOPAISKAT'];
+                            $tiedotIdx = null;
+                            foreach ($candidates as $cand) {
+                                $tiedotIdx = resolve_code_index($tiedot_map, $cand);
+                                if ($tiedotIdx !== null) break;
+                            }
+                            if ($tiedotIdx === null) {
+                                // fallback to current loop index m
+                                $tiedotIdx = $m;
+                            }
                             $offset = $i * $toimialaCount * $sukupuoliCount * $vuosiCount * $tiedotCount
                                     + $j * $sukupuoliCount * $vuosiCount * $tiedotCount
                                     + $k * $vuosiCount * $tiedotCount
                                     + $l * $tiedotCount
-                                    + $m;
-                            $tyopaikat = isset($data['value'][$offset]) ? $data['value'][$offset] : null;
+                                    + $tiedotIdx;
+                            $tyopaikat = isset($data['value'][$offset]) ? cast_numeric_or_null($data['value'][$offset]) : null;
                             // Haetaan maakunta_id Kunta-taulusta stat_code:n perusteella
                             $maakuntaId = null;
                             $mkQuery = "SELECT maakunta_id FROM Kunta WHERE stat_code = ? LIMIT 1";
@@ -216,8 +249,10 @@ function main() {
                             if (!$checkStmt) {
                                 throw new Exception("Virhe SQL-tarkistuslauseen valmistelussa: " . $conn->error);
                             }
-                            $checkStmt->bind_param("ssss", $alueId, $vuosiLabel, $toimialaLabel, $sukupuoliLabel);
-                            $checkStmt->execute();
+                            $bindOk = bind_stmt_params($checkStmt, [$alueId, $vuosiLabel, $toimialaLabel, $sukupuoliLabel]);
+                            if (!$bindOk || !$checkStmt->execute()) {
+                                throw new Exception("Virhe SQL-tarkistuslauseen suorittamisessa: " . $checkStmt->error);
+                            }
                             $checkStmt->bind_result($count);
                             $checkStmt->fetch();
                             $checkStmt->close();
@@ -228,8 +263,8 @@ function main() {
                                 if (!$updateStmt) {
                                     throw new Exception("Virhe SQL-päivityslauseen valmistelussa: " . $conn->error);
                                 }
-                                $updateStmt->bind_param("sssssssss", $alueLabel, $maakuntaId, $tyopaikat, $alueId, $timestamp, $alueId, $vuosiLabel, $toimialaLabel, $sukupuoliLabel);
-                                if (!$updateStmt->execute()) {
+                                $bindOk = bind_stmt_params($updateStmt, [$alueLabel, $maakuntaId, $tyopaikat, $alueId, $timestamp, $alueId, $vuosiLabel, $toimialaLabel, $sukupuoliLabel]);
+                                if (!$bindOk || !$updateStmt->execute()) {
                                     throw new Exception("Virhe SQL-päivityslauseen suorittamisessa: " . $updateStmt->error);
                                 }
                                 $updateStmt->close();
@@ -240,8 +275,8 @@ function main() {
                                 if (!$stmt) {
                                     throw new Exception("Virhe SQL-lauseen valmistelussa: " . $conn->error);
                                 }
-                                $stmt->bind_param("sssssssss", $alueId, $alueLabel, $maakuntaId, $vuosiLabel, $tyopaikat, $toimialaLabel, $sukupuoliLabel, $alueId, $timestamp);
-                                if (!$stmt->execute()) {
+                                $bindOk = bind_stmt_params($stmt, [$alueId, $alueLabel, $maakuntaId, $vuosiLabel, $tyopaikat, $toimialaLabel, $sukupuoliLabel, $alueId, $timestamp]);
+                                if (!$bindOk || !$stmt->execute()) {
                                     throw new Exception("Virhe SQL-lauseen suorittamisessa: " . $stmt->error);
                                 }
                                 $stmt->close();

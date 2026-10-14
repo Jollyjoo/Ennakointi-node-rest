@@ -50,6 +50,26 @@
         ]
       }
     }
+    ,
+    {
+      "code": "timeperiod_y",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "NÄMÄ-AIKA-TIEDOT-LASKETAAN-KOODISSA",
+          "EI-KÄYTETÄ-TÄTÄ-ARVOA"
+        ]
+      }
+    },
+    {
+      "code": "contentscode",
+      "selection": {
+        "filter": "item",
+        "values": [
+          "TYOPAIKAT"
+        ]
+      }
+    }
   ],
   "response": {
     "format": "json-stat2"
