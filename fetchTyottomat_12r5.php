@@ -54,6 +54,59 @@ function fetchData($apiUrl, $postData) {
     return json_decode($result, true);
 }
 
+// Apufunktio: etsi dimension-avain annetuilla nimiehdotuksilla
+function find_dimension_key($data, $candidates = []) {
+    if (!isset($data['dimension']) || !is_array($data['dimension'])) return null;
+    foreach ($data['dimension'] as $key => $dim) {
+        if (in_array($key, $candidates, true)) return $key;
+        // Tarkista mahdolliset id/variablecode-polut
+        if (isset($dim['id']) && in_array($dim['id'], $candidates, true)) return $key;
+        if (isset($dim['variableCode']) && in_array($dim['variableCode'], $candidates, true)) return $key;
+        // Tarkista labelit
+        if (isset($dim['category']['label']) && is_array($dim['category']['label'])) {
+            foreach ($dim['category']['label'] as $lbl) {
+                if (in_array($lbl, $candidates, true)) return $key;
+            }
+        }
+    }
+    return null;
+}
+
+// Apufunktio: yritä ratkaista analyysikentän koodin indeksi joustavasti
+function resolve_code_index($tiedot_map, $code) {
+    if (!$tiedot_map || !is_array($tiedot_map)) return null;
+    // suora löytyminen
+    if (isset($tiedot_map[$code])) return $tiedot_map[$code];
+    // etsi avain joka sisältää haettavan koodin (esim. etuliitteen muutos)
+    foreach ($tiedot_map as $k => $v) {
+        if (stripos($k, $code) !== false) return $v;
+        // myös tarkista, päättyykö avain koodiin (esim. ton-kuol)
+        if (preg_match('/' . preg_quote($code, '/') . '$/i', $k)) return $v;
+    }
+    return null;
+}
+
+// Apufunktio: muunna arvo numeroksi tai nulliksi
+function cast_numeric_or_null($val) {
+    if ($val === null) return null;
+    if (is_numeric($val)) return $val + 0; // säilyttää int/float
+    return null;
+}
+
+// Diagnostiikka: tulosta dimension-avaimet ja tiedot-koodit lokiin
+function dump_dimensions_for_debug($data) {
+    if (!isset($data['dimension']) || !is_array($data['dimension'])) return;
+    $out = [];
+    foreach ($data['dimension'] as $k => $dim) {
+        $labels = '';
+        if (isset($dim['category']['label']) && is_array($dim['category']['label'])) {
+            $labels = implode(',', array_slice($dim['category']['label'], 0, 5));
+        }
+        $out[] = "$k: labels={$labels}";
+    }
+    logMessage("Dimensions: " . implode(' | ', $out));
+}
+
 // Funktio lokiviestien kirjoittamiseen tiedostoon
 function logMessage($message) {
     $logFile = 'fetch-data.log';
@@ -82,8 +135,9 @@ function main() {
 
         // Päivitetään Kuukausi-arvot viimeisimmille 5 kuukaudelle
         $recentKuukaudet = getRecentKuukaudet(5);
+        $monthCandidates = ['Kuukausi', 'timeperiod_m', 'Month', 'Kuukausi'];
         foreach ($jsonArray['query'] as &$query) {
-            if ($query['code'] === 'Kuukausi') {
+            if (isset($query['code']) && in_array($query['code'], $monthCandidates, true)) {
                 $query['selection']['values'] = $recentKuukaudet;
             }
         }
@@ -98,7 +152,7 @@ function main() {
         for ($try = $maxTries; $try >= 1; $try--) {
             $monthsToTry = array_slice($recentKuukaudet, 0, $try); // Pudotetaan uusin kuukausi pois joka yrityksellä
             foreach ($jsonArray['query'] as &$query) {
-                if ($query['code'] === 'Kuukausi') {
+                if (isset($query['code']) && in_array($query['code'], $monthCandidates, true)) {
                     $query['selection']['values'] = $monthsToTry;
                 }
             }
@@ -117,19 +171,27 @@ function main() {
             throw new Exception("API epäonnistui kaikille viimeisimmille kuukausille");
         }
 
-        // Parsitaan data
-        $alueIndex = $data['dimension']['Alue']['category']['index'];
-        $alueLabels = $data['dimension']['Alue']['category']['label'];
-        $kuukausiIndex = $data['dimension']['Kuukausi']['category']['index'];
-        $kuukausiLabels = $data['dimension']['Kuukausi']['category']['label'];
-        $tiedotIndex = $data['dimension']['Tiedot']['category']['index'];
-        $tiedotLabels = $data['dimension']['Tiedot']['category']['label'];
+        // Parsitaan data (dynaamisesti etsitään dimension-avaimet)
+        // Tulostetaan diagnostinen informaatio dimensiosta
+        dump_dimensions_for_debug($data);
+        $alueKey = find_dimension_key($data, ['Alue', 'alue', 'Region', 'Region']) ?? (isset($data['dimension']['Alue']) ? 'Alue' : null);
+        $kuukausiKey = find_dimension_key($data, ['Kuukausi', 'timeperiod_m', 'Month']) ?? (isset($data['dimension']['Kuukausi']) ? 'Kuukausi' : null);
+        $tiedotKey = find_dimension_key($data, ['Tiedot', 'contentscode', 'Information']) ?? (isset($data['dimension']['Tiedot']) ? 'Tiedot' : null);
+        if (!$alueKey || !$kuukausiKey || !$tiedotKey) {
+            throw new Exception("Ei löytynyt odotettuja dimensioita: alue={$alueKey}, kuukausi={$kuukausiKey}, tiedot={$tiedotKey}");
+        }
+        $alueIndex = $data['dimension'][$alueKey]['category']['index'];
+        $alueLabels = $data['dimension'][$alueKey]['category']['label'];
+        $kuukausiIndex = $data['dimension'][$kuukausiKey]['category']['index'];
+        $kuukausiLabels = $data['dimension'][$kuukausiKey]['category']['label'];
+        $tiedotIndex = $data['dimension'][$tiedotKey]['category']['index'];
+        $tiedotLabels = $data['dimension'][$tiedotKey]['category']['label'];
 
         $alueKeys = array_keys($alueIndex);
         $kuukausiKeys = array_keys($kuukausiIndex);
         $tiedotKeys = array_keys($tiedotIndex);
-    // Build Tiedot code => index mapping for dynamic access
-    $tiedot_map = $tiedotIndex; // code => index
+        // Build Tiedot code => index mapping for dynamic access
+        $tiedot_map = $tiedotIndex; // code => index
 
         // Yhdistetään MySQL-tietokantaan
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -160,21 +222,34 @@ function main() {
                 $kuukausi = $kuukausiKeys[$j];
                 $aika = $kuukausi;
                 $offset = ($i * $kuukausiCount + $j) * $tiedotCount;
-                $tyottomatlopussa = isset($tiedot_map['TYOTTOMATLOPUSSA']) ? $data['value'][$offset + $tiedot_map['TYOTTOMATLOPUSSA']] : null;
-                $tyotosuus = isset($tiedot_map['TYOTOSUUS']) ? $data['value'][$offset + $tiedot_map['TYOTOSUUS']] : null;
-                $tyottomat20 = isset($tiedot_map['TYOTTOMAT20']) ? $data['value'][$offset + $tiedot_map['TYOTTOMAT20']] : null;
-                $tyottomat25 = isset($tiedot_map['TYOTTOMAT25']) ? $data['value'][$offset + $tiedot_map['TYOTTOMAT25']] : null;
-                $tyottomat50 = isset($tiedot_map['TYOTTOMAT50']) ? $data['value'][$offset + $tiedot_map['TYOTTOMAT50']] : null;
-                $tyottomatulk = isset($tiedot_map['TYOTTOMATULK']) ? $data['value'][$offset + $tiedot_map['TYOTTOMATULK']] : null;
-                $pitkaaikaistyottomat = isset($tiedot_map['PITKAAIKAISTYOTTOMAT']) ? $data['value'][$offset + $tiedot_map['PITKAAIKAISTYOTTOMAT']] : null;
-                $uudetavp = isset($tiedot_map['UUDETAVP']) ? $data['value'][$offset + $tiedot_map['UUDETAVP']] : null;
-                // Dynamically sum the 5 palvelut params
-                $tyollistettylop = isset($tiedot_map['TYOLLISTETTYLOP']) ? (int)$data['value'][$offset + $tiedot_map['TYOLLISTETTYLOP']] : 0;
-                $kokeilulop = isset($tiedot_map['KOKEILULOP']) ? (int)$data['value'][$offset + $tiedot_map['KOKEILULOP']] : 0;
-                $tvkoulutuslop = isset($tiedot_map['TVKOULUTUSLOP']) ? (int)$data['value'][$offset + $tiedot_map['TVKOULUTUSLOP']] : 0;
-                $valmennuslop = isset($tiedot_map['VALMENNUSLOP']) ? (int)$data['value'][$offset + $tiedot_map['VALMENNUSLOP']] : 0;
-                $mtppalvelutlop = isset($tiedot_map['MTPPALVELUTLOP']) ? (int)$data['value'][$offset + $tiedot_map['MTPPALVELUTLOP']] : 0;
-                $palvelut_yht = $tyollistettylop + $kokeilulop + $tvkoulutuslop + $valmennuslop + $mtppalvelutlop;                
+                $idx = resolve_code_index($tiedot_map, 'TYOTTOMATLOPUSSA');
+                $tyottomatlopussa = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                $idx = resolve_code_index($tiedot_map, 'TYOTOSUUS');
+                $tyotosuus = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                $idx = resolve_code_index($tiedot_map, 'TYOTTOMAT20');
+                $tyottomat20 = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                $idx = resolve_code_index($tiedot_map, 'TYOTTOMAT25');
+                $tyottomat25 = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                $idx = resolve_code_index($tiedot_map, 'TYOTTOMAT50');
+                $tyottomat50 = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                $idx = resolve_code_index($tiedot_map, 'TYOTTOMATULK');
+                $tyottomatulk = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                $idx = resolve_code_index($tiedot_map, 'PITKAAIKAISTYOTTOMAT');
+                $pitkaaikaistyottomat = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                $idx = resolve_code_index($tiedot_map, 'UUDETAVP');
+                $uudetavp = ($idx !== null && isset($data['value'][$offset + $idx])) ? cast_numeric_or_null($data['value'][$offset + $idx]) : null;
+                // Dynamically sum the 5 palvelut params (integers, 0 fallback)
+                $idx = resolve_code_index($tiedot_map, 'TYOLLISTETTYLOP');
+                $tyollistettylop = ($idx !== null && isset($data['value'][$offset + $idx]) && is_numeric($data['value'][$offset + $idx])) ? (int)$data['value'][$offset + $idx] : 0;
+                $idx = resolve_code_index($tiedot_map, 'KOKEILULOP');
+                $kokeilulop = ($idx !== null && isset($data['value'][$offset + $idx]) && is_numeric($data['value'][$offset + $idx])) ? (int)$data['value'][$offset + $idx] : 0;
+                $idx = resolve_code_index($tiedot_map, 'TVKOULUTUSLOP');
+                $tvkoulutuslop = ($idx !== null && isset($data['value'][$offset + $idx]) && is_numeric($data['value'][$offset + $idx])) ? (int)$data['value'][$offset + $idx] : 0;
+                $idx = resolve_code_index($tiedot_map, 'VALMENNUSLOP');
+                $valmennuslop = ($idx !== null && isset($data['value'][$offset + $idx]) && is_numeric($data['value'][$offset + $idx])) ? (int)$data['value'][$offset + $idx] : 0;
+                $idx = resolve_code_index($tiedot_map, 'MTPPALVELUTLOP');
+                $mtppalvelutlop = ($idx !== null && isset($data['value'][$offset + $idx]) && is_numeric($data['value'][$offset + $idx])) ? (int)$data['value'][$offset + $idx] : 0;
+                $palvelut_yht = $tyollistettylop + $kokeilulop + $tvkoulutuslop + $valmennuslop + $mtppalvelutlop;
                 // Tarkistetaan onko tietue jo olemassa tällä stat_code ja aika -arvolla
                 $checkQuery = "SELECT COUNT(*) FROM Tyonhakijat WHERE stat_code = ? AND aika = ?";
                 $checkStmt = $conn->prepare($checkQuery);
