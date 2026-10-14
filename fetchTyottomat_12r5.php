@@ -16,7 +16,7 @@ $password = "Juustonaksu5";
 $dbname = "catbxjbt_ennakointi";
 
 // Tilastokeskuksen API:n osoite
-$apiUrl = 'https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyonv/statfin_tyonv_pxt_12r5.px';
+$apiUrl = 'https://pxdata.stat.fi:443/PxWeb/api/v1/fi/StatFin/tyonv/12r5.px';
 $jsonFile = '_tyottomat_12r5.json';
 
 // Funktio JSON-tiedoston lukemiseen
