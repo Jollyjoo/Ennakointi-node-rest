@@ -1,7 +1,7 @@
 {
   "query": [
     {
-      "code": "alue_23_20230101",
+      "code": "alue_23_20260101",
       "selection": {
         "filter": "item",
         "values": [
@@ -55,7 +55,6 @@
       "selection": {
         "filter": "item",
         "values": [
-          "2021",
           "2022",
           "2023",
           "2024"
