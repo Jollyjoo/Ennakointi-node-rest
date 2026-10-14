@@ -55,17 +55,11 @@
       "selection": {
         "filter": "item",
         "values": [
-          "NÄMÄ-AIKA-TIEDOT-LASKETAAN-KOODISSA",
-          "EI-KÄYTETÄ-TÄTÄ-ARVOA"
-        ]
-      }
-    },
-    {
-      "code": "contentscode",
-      "selection": {
-        "filter": "item",
-        "values": [
-          "TYOPAIKAT"
+          "2021",
+          "2022",
+          "2023",
+          "2024",
+          "2025"
         ]
       }
     }
