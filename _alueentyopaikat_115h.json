@@ -1,7 +1,7 @@
 {
   "query": [
     {
-      "code": "Työpaikan alue",
+      "code": "alue_23_20230101",
       "selection": {
         "filter": "item",
         "values": [
@@ -31,7 +31,7 @@
       }
     },
     {
-      "code": "Toimiala",
+      "code": "toimiala_108_20230101",
       "selection": {
         "filter": "item",
         "values": [
@@ -40,7 +40,7 @@
       }
     },
     {
-      "code": "Sukupuoli",
+      "code": "sukupuoli_9_20180101",
       "selection": {
         "filter": "item",
         "values": [
@@ -49,8 +49,7 @@
           "2"
         ]
       }
-    }
-    ,
+    },
     {
       "code": "timeperiod_y",
       "selection": {
