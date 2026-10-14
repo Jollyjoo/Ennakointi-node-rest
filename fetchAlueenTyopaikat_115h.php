@@ -96,35 +96,24 @@ function main() {
         // Luetaan JSON-tiedosto taulukoksi
         $jsonArray = json_decode(file_get_contents($jsonFile), true);
 
-        // Päivitä mahdollinen Kuukausi- tai Vuosi-kenttä dynaamisesti
-        $recentKuukaudet = getRecentKuukaudet(5);
+        // 115h on vuositason aineisto, ei kuukausitasoista dataa.
         $recentVuodet = getRecentYears(5);
-        $monthCandidates = ['Kuukausi', 'timeperiod_m', 'Month'];
         $yearCandidates = ['Vuosi', 'timeperiod_y', 'Year'];
         foreach ($jsonArray['query'] as &$query) {
-            if (isset($query['code']) && in_array($query['code'], $monthCandidates, true)) {
-                $query['selection']['values'] = $recentKuukaudet;
-            }
             if (isset($query['code']) && in_array($query['code'], $yearCandidates, true)) {
                 $query['selection']['values'] = $recentVuodet;
             }
         }
         unset($query);
 
-        // Käytetään päivitettyä taulukkoa API-kutsuun
         $newStatData = $jsonArray;
 
-        // Yritetään hakea data, jos API palauttaa virheen, pudotetaan uusin kuukausi ja yritetään uudelleen
-        $maxTries = count($recentKuukaudet);
+        // Yritetään hakea data viimeisimmistä vuosista.
+        $maxTries = count($recentVuodet);
         $success = false;
         for ($try = $maxTries; $try >= 1; $try--) {
-            // Try both months and years if present
-            $monthsToTry = array_slice($recentKuukaudet, 0, $try);
             $yearsToTry = array_slice($recentVuodet, 0, $try);
             foreach ($jsonArray['query'] as &$query) {
-                if (isset($query['code']) && in_array($query['code'], $monthCandidates, true)) {
-                    $query['selection']['values'] = $monthsToTry;
-                }
                 if (isset($query['code']) && in_array($query['code'], $yearCandidates, true)) {
                     $query['selection']['values'] = $yearsToTry;
                 }
@@ -133,17 +122,15 @@ function main() {
             $newStatData = $jsonArray;
             try {
                 $data = fetchData($apiUrl, $newStatData);
-                //logMessage("API-vastaus saatu kuukausille: " . implode(",", $monthsToTry));
                 $success = true;
-                break; // Onnistui, poistutaan silmukasta
+                break;
             } catch (Exception $apiEx) {
-                logMessage("API-virhe kuukausille: " . implode(",", $monthsToTry) . " - Virhe: " . $apiEx->getMessage());
-                // Yritetään uudelleen yhdellä kuukaudella vähemmän
+                logMessage("API-virhe vuosille: " . implode(",", $yearsToTry) . " - Virhe: " . $apiEx->getMessage());
             }
         }
         if (!$success) {
-            logMessage("API epäonnistui kaikille kokeilluille kuukausille: " . implode(",", $recentKuukaudet));
-            throw new Exception("API epäonnistui kaikille viimeisimmille kuukausille");
+            logMessage("API epäonnistui kaikille kokeilluille vuosille: " . implode(",", $recentVuodet));
+            throw new Exception("API epäonnistui kaikille viimeisimmille vuosille");
         }
 
     // Parsitaan data dynaamisesti ja kirjoitetaan diagnostinen informaatio lokiin
@@ -183,7 +170,7 @@ function main() {
             throw new Exception("UTF8MB4 charsetin asetus epäonnistui: " . $conn->error);
         }
 
-        // value-taulukko on järjestyksessä: for each alue, for each toimiala, for each kuukausi, for each tiedot
+        // 115h on vuositason data: [Alue][Toimiala][Sukupuoli][Vuosi][Tiedot]
         $alueCount = count($alueKeys);
         $toimialaCount = count($toimialaKeys);
         $sukupuoliCount = count($sukupuoliKeys);
@@ -205,11 +192,7 @@ function main() {
                         for ($m = 0; $m < $tiedotCount; $m++) {
                             $tiedotId = $tiedotKeys[$m];
                             $tiedotLabel = isset($tiedotLabels[$tiedotId]) ? $tiedotLabels[$tiedotId] : $tiedotId;
-                            // Offset-laskenta: [Alue][Toimiala][Sukupuoli][Vuosi][Tiedot]
-                            // ratkaistaan tiedot-index dynaamisesti (esim. TYOPAIKATOL or similar)
                             $tiedot_map = $tiedotIndex;
-                            $desired_tiedot_code = 'AVPAIKATLOPUSSA';
-                            // try common code names for tyopaikat
                             $candidates = ['TYOPAIKAT', 'TYOPAIKATLOPUSSA', 'AVPAIKATLOPUSSA', 'Tyopaikat', 'TYOPAISKAT'];
                             $tiedotIdx = null;
                             foreach ($candidates as $cand) {
@@ -217,7 +200,6 @@ function main() {
                                 if ($tiedotIdx !== null) break;
                             }
                             if ($tiedotIdx === null) {
-                                // fallback to current loop index m
                                 $tiedotIdx = $m;
                             }
                             $offset = $i * $toimialaCount * $sukupuoliCount * $vuosiCount * $tiedotCount
@@ -226,7 +208,6 @@ function main() {
                                     + $l * $tiedotCount
                                     + $tiedotIdx;
                             $tyopaikat = isset($data['value'][$offset]) ? cast_numeric_or_null($data['value'][$offset]) : null;
-                            // Haetaan maakunta_id Kunta-taulusta stat_code:n perusteella
                             $maakuntaId = null;
                             $mkQuery = "SELECT maakunta_id FROM Kunta WHERE stat_code = ? LIMIT 1";
                             $mkStmt = $conn->prepare($mkQuery);
@@ -241,9 +222,7 @@ function main() {
                             } else {
                                 logMessage("Virhe Kunta-haussa: " . $conn->error);
                             }
-                            // Timestamp for insert/update
                             $timestamp = date('Y-m-d H:i:s');
-                            // Tarkistetaan onko tietue jo olemassa tällä alueella, toimialalla, sukupuolella ja vuodella
                             $checkQuery = "SELECT COUNT(*) FROM `Alueentyopaikat` WHERE Kunta_ID = ? AND Vuosi = ? AND Toimiala = ? AND Sukupuoli = ?";
                             $checkStmt = $conn->prepare($checkQuery);
                             if (!$checkStmt) {
@@ -257,7 +236,6 @@ function main() {
                             $checkStmt->fetch();
                             $checkStmt->close();
                             if ($count > 0) {
-                                // Päivitetään olemassa oleva tietue
                                 $updateQuery = "UPDATE `Alueentyopaikat` SET Kunta=?, Maakunta_ID=?, Tyopaikat=?, stat_code=?, timestamp=? WHERE Kunta_ID=? AND Vuosi=? AND Toimiala=? AND Sukupuoli=?";
                                 $updateStmt = $conn->prepare($updateQuery);
                                 if (!$updateStmt) {
@@ -269,7 +247,6 @@ function main() {
                                 }
                                 $updateStmt->close();
                             } else {
-                                // Lisätään uusi tietue
                                 $query = "INSERT INTO `Alueentyopaikat` (Kunta_ID, Kunta, Maakunta_ID, Vuosi, Tyopaikat, Toimiala, Sukupuoli, stat_code, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                                 $stmt = $conn->prepare($query);
                                 if (!$stmt) {
@@ -291,11 +268,11 @@ function main() {
         $conn->close();
 
         // Kirjoitetaan onnistumisviesti lokiin
-        logMessage("Avoimet työpaikat haettu ja tallennettu tietokantaan onnistuneesti.");
+        logMessage("Alueen työpaikat haettu ja tallennettu tietokantaan onnistuneesti.");
 
     } catch (Exception $e) {
         // Kirjoitetaan virheviesti lokiin
-        logMessage("Työttömät Virhe: " . $e->getMessage());
+        logMessage("115h Virhe: " . $e->getMessage());
         echo "Virhe: " . $e->getMessage() . "\n";
     }
 }
